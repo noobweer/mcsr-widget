@@ -15,6 +15,7 @@ export const useStatsStore = defineStore('stats', {
     rankIcon: '',
     latestMatchNickname: '',
     latestMatchElo: 0,
+    latestMatchRank: 0,
     latestMatchResult: 0,
     wins: 0,
     loses: 0,
@@ -88,13 +89,16 @@ export const useStatsStore = defineStore('stats', {
       let latestMatchNickname = ''
       let latestMatchElo = 0
       let latestMatchResult = 0
+      let latestMatchRank = 0
 
       if (latestMatch.players[0].uuid !== this.uuid) {
         latestMatchNickname = latestMatch.players[0].nickname
         latestMatchElo = latestMatch.players[0].eloRate
+        latestMatchRank = latestMatch.players[0].eloRank
       } else {
         latestMatchNickname = latestMatch.players[1].nickname
         latestMatchElo = latestMatch.players[1].eloRate
+        latestMatchRank = latestMatch.players[0].eloRank
       }
 
       if (latestMatch.changes[0].uuid === this.uuid) {
@@ -112,6 +116,7 @@ export const useStatsStore = defineStore('stats', {
       this.avg = msToHMS(winTimings.reduce((a, b) => a + b, 0) / (winTimings.length || 1))
       this.latestMatchNickname = latestMatchNickname
       this.latestMatchElo = latestMatchElo
+      this.latestMatchRank = latestMatchRank
       this.latestMatchResult = latestMatchResult
     },
 

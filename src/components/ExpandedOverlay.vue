@@ -1,6 +1,6 @@
 <script setup>
 import { useConfigStore } from '@/stores/config'
-import { delay, RowValue, animate, useMotionValue, useTransform } from 'motion-v'
+import { animate, delay, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { onUnmounted, watch } from 'vue'
 import LatestMatch from './LatestMatch.vue'
 import TodayStats from './TodayStats.vue'
@@ -37,6 +37,7 @@ const {
   winrate: Number,
   opponentNickname: String,
   opponentElo: Number,
+  opponentRank: Number,
   opponentResult: Number,
 })
 
@@ -49,7 +50,7 @@ const toggleLatest = () => {
   }, configStore.rate)
 }
 
-const intervalID = setInterval(toggleLatest, (configStore.rate * 1000) / 2 + 20)
+const intervalID = setInterval(toggleLatest, (configStore.rate * 1000) / 2)
 
 switch (configStore.state) {
   case 1:
@@ -139,6 +140,7 @@ onUnmounted(() => {
       v-if="!configStore.isLatest"
       :elo="opponentElo"
       :nickname="opponentNickname"
+      :rank="opponentRank"
       :result="opponentResult"
     />
     <TodayStats v-else :accent="accent" :wins="wins" :loses="loses" :elo="eloChange" :avg="avg" />

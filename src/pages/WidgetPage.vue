@@ -124,6 +124,7 @@ onMounted(() => {
         :winrate="statsStore.winrate"
         :opponentNickname="statsStore.latestMatchNickname"
         :opponentElo="statsStore.latestMatchElo"
+        :opponentRank="statsStore.latestMatchRank"
         :opponentResult="statsStore.latestMatchResult"
       />
     </motion.div>

@@ -4,7 +4,7 @@ import EloIcon from '@/assets/icons/elo.svg'
 import LosesIcon from '@/assets/icons/loses.svg'
 import WinsIcon from '@/assets/icons/wins.svg'
 import { eloChangeFormatter } from '@/lib/eloChangeForametter'
-import { animate, useMotionValue, useTransform, RowValue } from 'motion-v'
+import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
 const { accent, wins, loses, elo, avg } = defineProps({
@@ -50,7 +50,7 @@ watch(
             <LosesIcon :style="`color: ${accent}`" />
           </div>
           <div class="today-stats-values-badge-info">
-            <span class="today__text">Loses</span>
+            <span class="today__text">Losses</span>
             <span class="today-stats-values-badge__text">{{ loses || 0 }}</span>
           </div>
         </div>

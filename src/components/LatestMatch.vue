@@ -3,9 +3,10 @@ import { eloChangeFormatter } from '@/lib/eloChangeForametter'
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
-const { elo, nickname, result } = defineProps({
+const { elo, nickname, rank, result } = defineProps({
   elo: Number,
   nickname: String,
+  rank: Number,
   result: Number,
 })
 
@@ -33,7 +34,10 @@ watch(
           class="latest-match-opponent__icon"
         />
         <div class="latest-match-opponent-info">
-          <span class="latest__text">{{ elo }} elo</span>
+          <div class="latest-match-opponent-info-stats">
+            <span class="latest__text">{{ elo }} elo</span>
+            <span class="latest__text">#{{ rank }}</span>
+          </div>
           <span class="latest-match-opponent-info__nickname">{{ nickname }}</span>
         </div>
       </div>
@@ -85,17 +89,27 @@ watch(
 }
 .latest-match-opponent-info {
   display: flex;
+  width: 150px;
+  gap: 2px;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.4005rem;
+  min-width: 0;
+}
+.latest-match-opponent-info-stats {
+  display: flex;
+  gap: 0.5rem;
 }
 .latest-match-opponent-info__nickname {
   color: #fff;
-  text-align: center;
   font-size: 1rem;
   font-weight: 500;
-  line-height: 0.65538rem;
+  line-height: 1rem;
   letter-spacing: -0.01488rem;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 .latest-match-opponent__result {
   color: #a4a4a9;
