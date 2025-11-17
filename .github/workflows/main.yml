@@ -20,7 +20,11 @@ jobs:
         run: |
           ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd ${{ secrets.PROJECT_PATH }}
+            
+            git reset --hard HEAD
             git pull origin main
-            npm install --omit=dev
+            
+            npm ci --omit=dev || npm install
+            export PATH="$PATH:./node_modules/.bin"
             npm run build
           EOF
