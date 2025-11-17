@@ -35,6 +35,10 @@ export const useStatsStore = defineStore('stats', {
       this.rankIcon = eloToRank(this.elo)[1]
     },
 
+    getDayId(timestampMs) {
+      return Math.floor((timestampMs - 4 * 3600 * 1000) / (24 * 3600 * 1000))
+    },
+
     async userMatchesUpdater(nickname) {
       const userMatches = await getUserMatches(nickname)
 
@@ -43,23 +47,15 @@ export const useStatsStore = defineStore('stats', {
       let tempEloChange = 0
       const winTimings = []
 
-      const currentDate = new Date()
-      const todayUTC = Date.UTC(
-        currentDate.getUTCFullYear(),
-        currentDate.getUTCMonth(),
-        currentDate.getUTCDate(),
-      )
+      const todayId = this.getDayId(Date.now())
 
       for (const match of userMatches) {
-        const matchDate = new Date(match.date * 1000)
-        const matchDayUTC = Date.UTC(
-          matchDate.getUTCFullYear(),
-          matchDate.getUTCMonth(),
-          matchDate.getUTCDate(),
-        )
+        const matchDayId = this.getDayId(match.date * 1000)
 
-        if (matchDayUTC === todayUTC) {
-          if (match.result.uuid === this.uuid) {
+        if (matchDayId === todayId) {
+          const isPlayerWinner = match.result.uuid === this.uuid
+
+          if (isPlayerWinner) {
             tempWins += 1
 
             if (!match.forfeited) {
@@ -98,7 +94,7 @@ export const useStatsStore = defineStore('stats', {
       } else {
         latestMatchNickname = latestMatch.players[1].nickname
         latestMatchElo = latestMatch.players[1].eloRate
-        latestMatchRank = latestMatch.players[0].eloRank
+        latestMatchRank = latestMatch.players[1].eloRank
       }
 
       if (latestMatch.changes[0].uuid === this.uuid) {
