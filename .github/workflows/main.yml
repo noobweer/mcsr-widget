@@ -18,13 +18,20 @@ jobs:
 
       - name: Deploy to VPS
         run: |
-          ssh ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd ${{ secrets.PROJECT_PATH }}
             
-            git reset --hard HEAD
-            git pull origin main
-            
-            npm ci --omit=dev || npm install
-            export PATH="$PATH:./node_modules/.bin"
+            export NVM_DIR="$HOME/.nvm"
+            source "$NVM_DIR/nvm.sh"
+            nvm use 24
+
+            node -v
+            npm -v
+
+            git fetch origin main
+            git reset --hard origin/main
+
+            npm ci || npm install
+            export PATH="./node_modules/.bin:$PATH"
             npm run build
           EOF
