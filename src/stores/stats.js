@@ -35,53 +35,67 @@ export const useStatsStore = defineStore('stats', {
       this.rankIcon = eloToRank(this.elo)[1]
     },
 
-    getDayId(timestampMs) {
-      return Math.floor((timestampMs - 4 * 3600 * 1000) / (24 * 3600 * 1000))
-    },
-
     async userMatchesUpdater(nickname) {
       const userMatches = await getUserMatches(nickname)
+
+      if (!userMatches.length) return
 
       let tempWins = 0
       let tempLoses = 0
       let tempEloChange = 0
       const winTimings = []
 
-      const todayId = this.getDayId(Date.now())
+      const latestMatch = userMatches[0]
+      const latestMatchTime = latestMatch.date * 1000
+      const NOW = Date.now()
+      const SESSION_GAP = 6 * 3600 * 1000
 
-      for (const match of userMatches) {
-        const matchDayId = this.getDayId(match.date * 1000)
+      if (NOW - latestMatchTime > SESSION_GAP) {
+        this.wins = 0
+        this.loses = 0
+        this.eloChange = 0
+        this.winrate = 0
+        this.avg = msToHMS(0)
+        this.latestMatchNickname = ''
+        this.latestMatchElo = 0
+        this.latestMatchRank = 0
+        this.latestMatchResult = 0
+        return
+      }
 
-        if (matchDayId === todayId) {
-          const isPlayerWinner = match.result.uuid === this.uuid
+      const sessionMatches = [latestMatch]
+      let lastMatchTime = latestMatchTime
 
-          if (isPlayerWinner) {
-            tempWins += 1
+      for (let i = 1; i < userMatches.length; i++) {
+        const matchTime = userMatches[i].date * 1000
 
-            if (!match.forfeited) {
-              winTimings.push(match.result.time)
-            }
-
-            if (match.changes[0].uuid === this.uuid) {
-              tempEloChange += match.changes[0].change
-            } else {
-              tempEloChange += match.changes[1].change
-            }
-          } else {
-            if (match.result.uuid !== null) {
-              tempLoses += 1
-            }
-
-            if (match.changes[0].uuid === this.uuid) {
-              tempEloChange += match.changes[0].change
-            } else {
-              tempEloChange += match.changes[1].change
-            }
-          }
+        if (lastMatchTime - matchTime <= SESSION_GAP) {
+          sessionMatches.push(userMatches[i])
+          lastMatchTime = matchTime
+        } else {
+          break
         }
       }
 
-      const latestMatch = userMatches[0]
+      for (const match of sessionMatches) {
+        const isPlayerWinner = match.result.uuid === this.uuid
+
+        if (isPlayerWinner) {
+          tempWins++
+          if (!match.forfeited) {
+            winTimings.push(match.result.time)
+          }
+        } else if (match.result.uuid !== null) {
+          tempLoses++
+        }
+
+        if (match.changes[0].uuid === this.uuid) {
+          tempEloChange += match.changes[0].change
+        } else {
+          tempEloChange += match.changes[1].change
+        }
+      }
+
       let latestMatchNickname = ''
       let latestMatchElo = 0
       let latestMatchResult = 0
