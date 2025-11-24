@@ -107,6 +107,7 @@ onMounted(() => {
         :leaderboard="configStore.leaderboard"
         :wins="statsStore.wins"
         :loses="statsStore.loses"
+        :winrate="statsStore.winrate"
       />
 
       <ExpandedOverlay

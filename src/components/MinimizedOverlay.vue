@@ -3,7 +3,7 @@ import { eloChangeFormatter } from '@/lib/eloChangeForametter'
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
-const { elo, eloRank, rankIcon, eloChange, leaderboard, wins, loses } = defineProps({
+const { elo, eloRank, rankIcon, eloChange, leaderboard, wins, loses, winrate } = defineProps({
   elo: Number,
   eloRank: Number,
   rankIcon: String,
@@ -11,6 +11,7 @@ const { elo, eloRank, rankIcon, eloChange, leaderboard, wins, loses } = definePr
   leaderboard: Boolean,
   wins: Number,
   loses: Number,
+  winrate: Number,
 })
 
 const changeCounter = useMotionValue(Math.abs(eloChange))
@@ -77,6 +78,7 @@ watch(
         <span>{{ wins }}W</span>
         <span>{{ loses }}L</span>
       </div>
+      <span>{{ winrate }}%</span>
       <span>#<RowValue :value="leaderboardRounded" /></span>
     </div>
   </div>
