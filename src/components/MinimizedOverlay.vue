@@ -3,12 +3,14 @@ import { eloChangeFormatter } from '@/lib/eloChangeForametter'
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
-const { elo, eloRank, rankIcon, eloChange, leaderboard } = defineProps({
+const { elo, eloRank, rankIcon, eloChange, leaderboard, wins, loses } = defineProps({
   elo: Number,
   eloRank: Number,
   rankIcon: String,
   eloChange: Number,
   leaderboard: Boolean,
+  wins: Number,
+  loses: Number,
 })
 
 const changeCounter = useMotionValue(Math.abs(eloChange))
@@ -49,13 +51,15 @@ watch(
 </script>
 
 <template>
-  <div class="minimized" :class="{ 'minimized-leaderboard': leaderboard }">
-    <div class="miminized-info" :class="{ 'miminized-info-leaderboard': leaderboard }">
+  <div class="minimized" :style="leaderboard ? 'padding: 0 6px 0 6px' : ''">
+    <div class="miminized-info">
       <div class="miminized-info-rank">
         <img
           :src="`/icons/${rankIcon || 'coal'}.png`"
           alt="rank icon"
-          class="miminized-info-rank__icon"
+          :class="
+            leaderboard ? 'miminized-info-rank__icon_small' : 'miminized-info-rank__icon_large'
+          "
         />
         <span class="miminized-info-rank__text"><RowValue :value="eloRounded" /> elo</span>
       </div>
@@ -68,10 +72,12 @@ watch(
         >{{ eloChangeFormatter(eloChange) }}<RowValue :value="changeRounded"
       /></span>
     </div>
-    <div v-if="leaderboard" class="minimized-divider"></div>
-    <div v-if="leaderboard" class="leaderboard-block">
-      <span class="leaderboard-block__hashtag">#</span>
-      <span class="leaderboard-block__position"><RowValue :value="leaderboardRounded" /></span>
+    <div v-if="leaderboard" class="stats stats__text">
+      <div class="stats-matches">
+        <span>{{ wins }}W</span>
+        <span>{{ loses }}L</span>
+      </div>
+      <span>#<RowValue :value="leaderboardRounded" /></span>
     </div>
   </div>
 </template>
@@ -80,52 +86,16 @@ watch(
 .minimized {
   display: flex;
   width: 100%;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-}
-.minimized-leaderboard {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.25rem;
-}
-.leaderboard-block {
-  display: flex;
-  width: 4rem;
   justify-content: center;
-  align-items: flex-end;
-}
-.minimized-divider {
-  width: 0.1875rem;
-  height: 3rem;
-  flex-shrink: 0;
-  background: #18181b;
-}
-.leaderboard-block__hashtag {
-  color: #a4a4a9;
-  font-size: 1.125rem;
-  font-weight: 500;
-  line-height: 1.125rem;
-  letter-spacing: -0.01488rem;
-}
-.leaderboard-block__position {
-  color: #a4a4a9;
-  font-size: 1.5rem;
-  font-weight: 500;
-  line-height: 1.5rem;
-  letter-spacing: -0.01488rem;
+  gap: 6px;
 }
 .miminized-info {
   display: flex;
+  width: 100%;
   justify-content: space-between;
   flex-grow: 1;
-  align-items: center;
-}
-.miminized-info-leaderboard {
-  display: flex;
-  /* max-width: 11.75rem; */
-  justify-content: space-between;
   align-items: center;
 }
 .miminized-info-rank {
@@ -133,9 +103,14 @@ watch(
   align-items: center;
   gap: 0.125rem;
 }
-.miminized-info-rank__icon {
+.miminized-info-rank__icon_large {
   width: 2rem;
   height: 2rem;
+  image-rendering: pixelated;
+}
+.miminized-info-rank__icon_small {
+  width: 24px;
+  height: 24px;
   image-rendering: pixelated;
 }
 .miminized-info-rank__text {
@@ -149,7 +124,7 @@ watch(
   color: #a4a4a9;
   text-align: center;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.5rem;
   letter-spacing: -0.01488rem;
 }
@@ -159,5 +134,23 @@ watch(
 }
 .miminized-info__text--negative {
   color: #fa3532;
+}
+
+.stats {
+  display: flex;
+  width: 100%;
+  color: white;
+  justify-content: space-between;
+}
+.stats-matches {
+  display: flex;
+  gap: 8px;
+}
+.stats__text {
+  color: #a4a4a9;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1rem;
+  letter-spacing: -0.01488rem;
 }
 </style>

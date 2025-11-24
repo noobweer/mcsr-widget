@@ -39,9 +39,9 @@ const variants = {
   },
   visible: {
     scale: 1,
-    height: 48,
-    width: configStore.leaderboard ? 290 : 226,
-    padding: configStore.leaderboard ? '0rem 0.5rem 0rem 0.8rem' : '0.5rem 1rem',
+    height: configStore.leaderboard ? 64 : 48,
+    width: 226,
+    padding: '0.5rem 1rem',
   },
   extended: {
     scale: 1,
@@ -105,6 +105,8 @@ onMounted(() => {
         :eloChange="statsStore.eloChange"
         :rankIcon="statsStore.rankIcon"
         :leaderboard="configStore.leaderboard"
+        :wins="statsStore.wins"
+        :loses="statsStore.loses"
       />
 
       <ExpandedOverlay
@@ -138,6 +140,7 @@ onMounted(() => {
 }
 .widget {
   display: flex;
+  flex-direction: column;
   overflow: hidden;
   gap: 1rem;
   border-radius: 2rem;
