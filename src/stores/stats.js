@@ -1,27 +1,44 @@
 import { eloToRank } from '@/lib/eloToRank'
+import { getLiveMatch } from '@/lib/getLiveMatch'
 import { getUserInfo } from '@/lib/getUserInfo'
 import { getUserMatches } from '@/lib/getUserMatches'
 import { msToHMS } from '@/lib/msToHMS'
+import { opponentSplitDiff } from '@/lib/opponentSplitDiff'
 import { preloadImage } from '@/lib/preloadImage'
 import { defineStore } from 'pinia'
 
 export const useStatsStore = defineStore('stats', {
   state: () => ({
+    // Player Info
     uuid: '',
     elo: 0,
     eloRank: 0,
     eloChange: 0,
     rank: '',
     rankIcon: '',
-    latestMatchNickname: '',
-    latestMatchElo: 0,
-    latestMatchRank: 0,
-    latestMatchResult: 0,
     wins: 0,
     loses: 0,
     winrate: 0,
     avg: '',
+
+    // Latest Match and Opponent Info
+    latestMatchNickname: '',
+    latestMatchElo: 0,
+    latestMatchRank: 0,
+    latestMatchResult: 0,
+
+    // Live Match and Opponent Info
+    isLiveMatch: false,
+    liveMatchUUID: '',
+    liveMatchNickname: '',
+    liveMatchElo: 0,
+    liveMatchRank: 0,
+    liveMatchAvg: '',
+    liveMatchSplit: '',
+    liveMatchDiff: 0,
+    liveMatchDiffTemp: 0,
     _intervalId: null,
+    __intervalId: null,
   }),
   actions: {
     async userInfoUpdater(nickname) {
@@ -130,16 +147,48 @@ export const useStatsStore = defineStore('stats', {
       this.latestMatchResult = latestMatchResult
     },
 
-    startAutoUpdate(nickname) {
-      if (this._intervalId) return
+    async userLiveMatchUpdater(uuid) {
+      const liveMatch = await getLiveMatch(uuid)
 
-      this.userInfoUpdater(nickname)
-      this.userMatchesUpdater(nickname)
+      if (liveMatch) {
+        const allUUIDs = Object.keys(liveMatch.data)
+        const opponentUUID = allUUIDs.find((id) => id !== uuid)
+        const opponentInfo = await getUserInfo(opponentUUID)
+
+        this.liveMatchUUID = opponentUUID
+        this.liveMatchNickname = opponentInfo.nickname
+        this.liveMatchElo = opponentInfo.elo
+        this.liveMatchRank = opponentInfo.eloRank
+
+        const playerData = liveMatch.data[uuid]
+        const opponentData = liveMatch.data[opponentUUID]
+        const splitsData = opponentSplitDiff(
+          playerData,
+          opponentData,
+          liveMatch.currentTime,
+          this.liveMatchDiffTemp,
+        )
+
+        this.liveMatchSplit = splitsData.opponentSplit
+        this.liveMatchDiff = splitsData.diffSeconds
+        this.liveMatchDiffTemp = splitsData.newPrevDiff
+        this.isLiveMatch = true
+      } else {
+        this.isLiveMatch = false
+      }
+    },
+
+    startAutoUpdate(nickname, uuid) {
+      if (this._intervalId) return
 
       this._intervalId = setInterval(() => {
         this.userInfoUpdater(nickname)
         this.userMatchesUpdater(nickname)
       }, 10000)
+
+      this.__intervalId = setInterval(() => {
+        this.userLiveMatchUpdater(uuid)
+      }, 5000)
     },
   },
 })

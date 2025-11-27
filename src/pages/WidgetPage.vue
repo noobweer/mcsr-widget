@@ -1,4 +1,5 @@
 <script setup>
+import CurrentMatch from '@/components/CurrentMatch.vue'
 import ExpandedOverlay from '@/components/ExpandedOverlay.vue'
 import MinimizedOverlay from '@/components/MinimizedOverlay.vue'
 import { useConfigStore } from '@/stores/config'
@@ -83,8 +84,10 @@ switch (configStore.state) {
 onUnmounted(() => {
   clearInterval(toggleIntervalID)
 })
-onMounted(() => {
-  statsStore.startAutoUpdate(configStore.nickname)
+onMounted(async () => {
+  await statsStore.userInfoUpdater(configStore.nickname)
+  await statsStore.userMatchesUpdater(configStore.nickname)
+  statsStore.startAutoUpdate(configStore.nickname, statsStore.uuid)
 })
 </script>
 
@@ -132,6 +135,14 @@ onMounted(() => {
       />
     </motion.div>
   </div>
+  <CurrentMatch
+    v-if="statsStore.isLiveMatch"
+    :nickname="statsStore.liveMatchNickname"
+    :elo="statsStore.liveMatchElo"
+    :leaderboard="statsStore.liveMatchRank"
+    :split="statsStore.liveMatchSplit"
+    :diff="statsStore.liveMatchDiff"
+  />
 </template>
 
 <style scoped>

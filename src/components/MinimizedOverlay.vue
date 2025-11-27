@@ -1,5 +1,5 @@
 <script setup>
-import { eloChangeFormatter } from '@/lib/eloChangeForametter'
+import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
@@ -52,7 +52,7 @@ watch(
 </script>
 
 <template>
-  <div class="minimized" :style="leaderboard ? 'padding: 0 6px 0 6px' : ''">
+  <div class="minimized">
     <div class="miminized-info">
       <div class="miminized-info-rank">
         <img
@@ -143,6 +143,7 @@ watch(
   width: 100%;
   color: white;
   justify-content: space-between;
+  padding: 0 6px;
 }
 .stats-matches {
   display: flex;

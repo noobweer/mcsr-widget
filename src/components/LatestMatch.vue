@@ -1,5 +1,5 @@
 <script setup>
-import { eloChangeFormatter } from '@/lib/eloChangeForametter'
+import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
