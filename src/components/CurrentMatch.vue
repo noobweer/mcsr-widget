@@ -1,6 +1,4 @@
 <script setup>
-import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
-
 const { nickname, avg, elo, leaderboard, split, diff } = defineProps({
   nickname: String,
   avg: String,
@@ -20,7 +18,7 @@ const { nickname, avg, elo, leaderboard, split, diff } = defineProps({
           'match__text--negative': diff > 0,
           'match__text--positive': diff < 0,
         }"
-        >{{ eloChangeFormatter() + String(diff) }}s</span
+        >{{ diff }}s</span
       >
     </div>
 

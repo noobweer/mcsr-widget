@@ -1,4 +1,4 @@
-export function opponentSplitDiff(playerData, opponentData, now, prevDiff = 0) {
+export function opponentSplitDiff(playerData, opponentData, now, prevDiff) {
   const getSplit = (data) => data.timeline?.type ?? 'overworld'
   const getTime = (data) => data.timeline?.time ?? null
 
@@ -38,29 +38,44 @@ export function opponentSplitDiff(playerData, opponentData, now, prevDiff = 0) {
   const cleanOpponentSplit = splitOrderClean[opponentIndex] ?? 'overworld'
 
   // ============================================================================
-  // CASE 1: Оба на одном сплите → разница фиксируется
+  // CASE 0: оба в overworld → diff всегда 0
   // ============================================================================
-  if (playerIndex === opponentIndex && playerTime !== null && opponentTime !== null) {
-    diffSeconds = Math.round((opponentTime - playerTime) / 1000)
+  if (playerIndex === 0 && opponentIndex === 0) {
+    diffSeconds = 0
+    newPrevDiff = 0
+  }
+
+  // ============================================================================
+  // CASE 1: оба на одном сплите → сравнение по времени входа
+  // → знак не должен изменяться, пока не сменится сам сплит
+  // ============================================================================
+  else if (playerIndex === opponentIndex && playerTime !== null && opponentTime !== null) {
+    let rawDiff = Math.round((opponentTime - playerTime) / 1000)
+
+    // Удержание знака:
+    // если знак изменился внутри одного сплита → возвращаем старый
+    if (prevDiff !== 0 && Math.sign(rawDiff) !== Math.sign(prevDiff)) {
+      rawDiff = Math.abs(rawDiff) * Math.sign(prevDiff)
+    }
+
+    diffSeconds = rawDiff
+    newPrevDiff = rawDiff
+  }
+
+  // ============================================================================
+  // CASE 2: оппонент дальше по сплитам → он впереди
+  // ============================================================================
+  else if (opponentIndex > playerIndex && opponentTime !== null) {
+    diffSeconds = Math.round((now - opponentTime) / 1000)
     newPrevDiff = diffSeconds
   }
 
   // ============================================================================
-  // CASE 2: ОППОНЕНТ впереди (выше по списку сплитов)
-  // difference = сколько прошло времени с момента его входа
-  // -> ПОЛОЖИТЕЛЬНЫЙ diff (ты отстаёшь)
-  // ============================================================================
-  else if (opponentIndex > playerIndex && opponentTime !== null) {
-    diffSeconds = Math.round((now - opponentTime) / 1000)
-  }
-
-  // ============================================================================
-  // CASE 3: ИГРОК впереди
-  // difference = сколько прошло времени с момента твоего входа
-  // -> ОТРИЦАТЕЛЬНЫЙ diff (ты впереди)
+  // CASE 3: игрок дальше по сплитам → он впереди
   // ============================================================================
   else if (playerIndex > opponentIndex && playerTime !== null) {
     diffSeconds = -Math.round((now - playerTime) / 1000)
+    newPrevDiff = diffSeconds
   }
 
   return {
