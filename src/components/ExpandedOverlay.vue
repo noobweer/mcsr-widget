@@ -107,7 +107,9 @@ onUnmounted(() => {
           <span class="expanded-info-stats__text"><RowValue :value="eloRounded" /> elo</span>
           <div class="expanded-info-stats-leader expanded-info-stats__text">
             <span class="expanded-info-stats__hashtag">#</span>
-            <RowValue class="expanded-info-stats__text" :value="leaderboardRounded" />
+            <span class="expanded-info-stats__text">
+              <RowValue :value="leaderboardRounded" />
+            </span>
           </div>
         </div>
 

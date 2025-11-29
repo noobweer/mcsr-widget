@@ -134,21 +134,23 @@ onMounted(async () => {
         :opponentResult="statsStore.latestMatchResult"
       />
     </motion.div>
+    <CurrentMatch
+      v-if="statsStore.isLiveMatch"
+      :nickname="statsStore.liveMatchNickname"
+      :elo="statsStore.liveMatchElo"
+      :leaderboard="statsStore.liveMatchRank"
+      :split="statsStore.liveMatchSplit"
+      :diff="statsStore.liveMatchDiff"
+    />
   </div>
-  <CurrentMatch
-    v-if="statsStore.isLiveMatch"
-    :nickname="statsStore.liveMatchNickname"
-    :elo="statsStore.liveMatchElo"
-    :leaderboard="statsStore.liveMatchRank"
-    :split="statsStore.liveMatchSplit"
-    :diff="statsStore.liveMatchDiff"
-  />
 </template>
 
 <style scoped>
 .container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 .widget {
   display: flex;

@@ -1,4 +1,7 @@
 <script setup>
+import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
+import { motion } from 'motion-v'
+
 const { nickname, avg, elo, leaderboard, split, diff } = defineProps({
   nickname: String,
   avg: String,
@@ -7,10 +10,30 @@ const { nickname, avg, elo, leaderboard, split, diff } = defineProps({
   split: String,
   diff: Number,
 })
+
+const currentMatchVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.85,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.28,
+    },
+  },
+}
 </script>
 
 <template>
-  <div class="match">
+  <motion.div
+    class="match"
+    :variants="currentMatchVariants"
+    initial="hidden"
+    animate="visible"
+    exit="hidden"
+  >
     <div class="match-header match__text">
       <span>Current match</span>
       <span
@@ -18,7 +41,7 @@ const { nickname, avg, elo, leaderboard, split, diff } = defineProps({
           'match__text--negative': diff > 0,
           'match__text--positive': diff < 0,
         }"
-        >{{ diff }}s</span
+        >{{ eloChangeFormatter(diff) + Math.abs(diff) }}s</span
       >
     </div>
 
@@ -33,7 +56,7 @@ const { nickname, avg, elo, leaderboard, split, diff } = defineProps({
       </div>
       <img :src="`/icons/splits/${split}.png`" class="match-opponent-split" />
     </div>
-  </div>
+  </motion.div>
 </template>
 
 <style scoped>
@@ -54,7 +77,7 @@ const { nickname, avg, elo, leaderboard, split, diff } = defineProps({
 .match__text {
   color: #a4a4a9;
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 0.875rem;
   letter-spacing: -0.01488rem;
 }

@@ -153,12 +153,14 @@ export const useStatsStore = defineStore('stats', {
       if (liveMatch) {
         const allUUIDs = Object.keys(liveMatch.data)
         const opponentUUID = allUUIDs.find((id) => id !== uuid)
-        const opponentInfo = await getUserInfo(opponentUUID)
 
-        this.liveMatchUUID = opponentUUID
-        this.liveMatchNickname = opponentInfo.nickname
-        this.liveMatchElo = opponentInfo.elo
-        this.liveMatchRank = opponentInfo.eloRank
+        if (!this.liveMatchNickname) {
+          const opponentInfo = await getUserInfo(opponentUUID)
+          this.liveMatchUUID = opponentUUID
+          this.liveMatchNickname = opponentInfo.nickname
+          this.liveMatchElo = opponentInfo.elo
+          this.liveMatchRank = opponentInfo.eloRank
+        }
 
         const playerData = liveMatch.data[uuid]
         const opponentData = liveMatch.data[opponentUUID]
