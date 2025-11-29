@@ -3,12 +3,12 @@ import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
-const { elo, eloRank, rankIcon, eloChange, leaderboard, wins, loses, winrate } = defineProps({
+const { elo, eloRank, rankIcon, eloChange, advanced, wins, loses, winrate } = defineProps({
   elo: Number,
   eloRank: Number,
   rankIcon: String,
   eloChange: Number,
-  leaderboard: Boolean,
+  advanced: Boolean,
   wins: Number,
   loses: Number,
   winrate: Number,
@@ -58,9 +58,7 @@ watch(
         <img
           :src="`/icons/${rankIcon || 'coal'}.png`"
           alt="rank icon"
-          :class="
-            leaderboard ? 'miminized-info-rank__icon_small' : 'miminized-info-rank__icon_large'
-          "
+          :class="advanced ? 'miminized-info-rank__icon_small' : 'miminized-info-rank__icon_large'"
         />
         <span class="miminized-info-rank__text"><RowValue :value="eloRounded" /> elo</span>
       </div>
@@ -73,7 +71,7 @@ watch(
         >{{ eloChangeFormatter(eloChange) }}<RowValue :value="changeRounded"
       /></span>
     </div>
-    <div v-if="leaderboard" class="stats stats__text">
+    <div v-if="advanced" class="stats stats__text">
       <div class="stats-matches">
         <span>{{ wins }}W</span>
         <span>{{ loses }}L</span>

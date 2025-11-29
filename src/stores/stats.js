@@ -154,12 +154,14 @@ export const useStatsStore = defineStore('stats', {
         const allUUIDs = Object.keys(liveMatch.data)
         const opponentUUID = allUUIDs.find((id) => id !== uuid)
 
-        if (!this.liveMatchNickname) {
+        if (!this.liveMatchUUID || this.liveMatchUUID !== opponentUUID) {
           const opponentInfo = await getUserInfo(opponentUUID)
           this.liveMatchUUID = opponentUUID
           this.liveMatchNickname = opponentInfo.nickname
           this.liveMatchElo = opponentInfo.elo
           this.liveMatchRank = opponentInfo.eloRank
+
+          preloadImage(`https://mineskin.eu/helm/${opponentInfo.nickname}/100.png`)
         }
 
         const playerData = liveMatch.data[uuid]
@@ -180,7 +182,7 @@ export const useStatsStore = defineStore('stats', {
       }
     },
 
-    startAutoUpdate(nickname, uuid) {
+    startAutoUpdate(nickname, uuid, liveMatch) {
       if (this._intervalId) return
 
       this._intervalId = setInterval(() => {
@@ -188,9 +190,11 @@ export const useStatsStore = defineStore('stats', {
         this.userMatchesUpdater(nickname)
       }, 10000)
 
-      this.__intervalId = setInterval(() => {
-        this.userLiveMatchUpdater(uuid)
-      }, 5000)
+      if (liveMatch) {
+        this.__intervalId = setInterval(() => {
+          this.userLiveMatchUpdater(uuid)
+        }, 5000)
+      }
     },
   },
 })

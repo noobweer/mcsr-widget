@@ -2,6 +2,7 @@
 import CurrentMatch from '@/components/CurrentMatch.vue'
 import ExpandedOverlay from '@/components/ExpandedOverlay.vue'
 import MinimizedOverlay from '@/components/MinimizedOverlay.vue'
+import { preloadSplitIcons } from '@/lib/preloadSplitIcons'
 import { useConfigStore } from '@/stores/config'
 import { useStatsStore } from '@/stores/stats'
 import { delay, motion, useAnimate } from 'motion-v'
@@ -40,7 +41,7 @@ const variants = {
   },
   visible: {
     scale: 1,
-    height: configStore.leaderboard ? 64 : 48,
+    height: configStore.advancedMinimized ? 64 : 48,
     width: 226,
     padding: '0.5rem 1rem',
   },
@@ -87,7 +88,11 @@ onUnmounted(() => {
 onMounted(async () => {
   await statsStore.userInfoUpdater(configStore.nickname)
   await statsStore.userMatchesUpdater(configStore.nickname)
-  statsStore.startAutoUpdate(configStore.nickname, statsStore.uuid)
+  statsStore.startAutoUpdate(configStore.nickname, statsStore.uuid, configStore.liveMatch)
+
+  if (statsStore.liveMatch) {
+    preloadSplitIcons()
+  }
 })
 </script>
 
@@ -107,7 +112,7 @@ onMounted(async () => {
         :eloRank="statsStore.eloRank"
         :eloChange="statsStore.eloChange"
         :rankIcon="statsStore.rankIcon"
-        :leaderboard="configStore.leaderboard"
+        :advanced="configStore.advancedMinimized"
         :wins="statsStore.wins"
         :loses="statsStore.loses"
         :winrate="statsStore.winrate"

@@ -15,6 +15,9 @@ const currentMatchVariants = {
   hidden: {
     opacity: 0,
     scale: 0.85,
+    transition: {
+      duration: 0.28,
+    },
   },
   visible: {
     opacity: 1,
@@ -37,6 +40,7 @@ const currentMatchVariants = {
     <div class="match-header match__text">
       <span>Current match</span>
       <span
+        style="font-weight: 500"
         :class="{
           'match__text--negative': diff > 0,
           'match__text--positive': diff < 0,
@@ -47,7 +51,10 @@ const currentMatchVariants = {
 
     <div class="match-opponent">
       <div class="match-opponent-stats">
-        <span class="match-opponent-stats__primary">{{ nickname }}</span>
+        <div class="match-opponent" style="gap: 6px">
+          <img :src="`https://mineskin.eu/helm/${nickname}/100.png`" class="match-opponent__icon" />
+          <span class="match-opponent-stats__primary">{{ nickname }}</span>
+        </div>
         <div class="match-opponent">
           <span class="match__text">{{ elo }} elo</span>
           <span class="match__text">{{ avg }} avg</span>
@@ -77,7 +84,7 @@ const currentMatchVariants = {
 .match__text {
   color: #a4a4a9;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 0.875rem;
   letter-spacing: -0.01488rem;
 }
@@ -108,6 +115,11 @@ const currentMatchVariants = {
   font-weight: 500;
   line-height: 1.2rem;
   letter-spacing: -0.01488rem;
+}
+.match-opponent__icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
 }
 .match-opponent-split {
   width: 34px;
