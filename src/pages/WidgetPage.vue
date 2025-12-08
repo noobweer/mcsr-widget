@@ -82,10 +82,6 @@ switch (configStore.state) {
     break
 }
 
-const toogleLiveMatch = () => {
-  statsStore.isLiveMatch = !statsStore.isLiveMatch
-}
-
 onUnmounted(() => {
   clearInterval(toggleIntervalID)
 })
