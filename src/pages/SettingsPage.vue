@@ -1,5 +1,6 @@
 <script setup>
 import CopyIcon from '@/assets/icons/copy.svg'
+
 import MinimizedOverlay from '@/components/MinimizedOverlay.vue'
 import PreviewExpandedLatest from '@/components/PreviewExpandedLatest.vue'
 import PreviewExpandedToday from '@/components/PreviewExpandedToday.vue'
@@ -59,7 +60,7 @@ const copyWidgetUrl = () => {
   localStorage.setItem('selectedAccent', selectedAccent.value)
   localStorage.setItem('selectedRate', selectedRate.value)
 
-  const widgetUrl = `${import.meta.env.VITE_HOST}/widget?nickname=${nickname.value}&badge=${selectedBadge.value}&rate=${selectedRate.value}&accent=${selectedAccent.value}&state=${selectedStyle.value}`
+  const widgetUrl = `${window.location.origin}/widget?nickname=${nickname.value}&badge=${selectedBadge.value}&rate=${selectedRate.value}&accent=${selectedAccent.value}&state=${selectedStyle.value}`
   navigator.clipboard.writeText(widgetUrl)
 
   toast.success(

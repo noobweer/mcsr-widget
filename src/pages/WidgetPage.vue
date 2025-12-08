@@ -82,6 +82,10 @@ switch (configStore.state) {
     break
 }
 
+const toogleLiveMatch = () => {
+  statsStore.isLiveMatch = !statsStore.isLiveMatch
+}
+
 onUnmounted(() => {
   clearInterval(toggleIntervalID)
 })
@@ -90,7 +94,7 @@ onMounted(async () => {
   await statsStore.userMatchesUpdater(configStore.nickname)
   statsStore.startAutoUpdate(configStore.nickname, statsStore.uuid, configStore.liveMatch)
 
-  if (statsStore.liveMatch) {
+  if (configStore.liveMatch) {
     preloadSplitIcons()
   }
 })
@@ -140,9 +144,10 @@ onMounted(async () => {
       />
     </motion.div>
     <CurrentMatch
-      v-if="statsStore.isLiveMatch"
+      :isLiveMatch="statsStore.isLiveMatch"
       :nickname="statsStore.liveMatchNickname"
       :elo="statsStore.liveMatchElo"
+      :avg="statsStore.liveMatchAvg"
       :leaderboard="statsStore.liveMatchRank"
       :split="statsStore.liveMatchSplit"
       :diff="statsStore.liveMatchDiff"

@@ -1,8 +1,9 @@
 <script setup>
 import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
-import { motion } from 'motion-v'
+import { AnimatePresence, motion } from 'motion-v'
 
-const { nickname, avg, elo, leaderboard, split, diff } = defineProps({
+const { isLiveMatch, nickname, avg, elo, leaderboard, split, diff } = defineProps({
+  isLiveMatch: Boolean,
   nickname: String,
   avg: String,
   elo: Number,
@@ -14,56 +15,62 @@ const { nickname, avg, elo, leaderboard, split, diff } = defineProps({
 const currentMatchVariants = {
   hidden: {
     opacity: 0,
-    scale: 0.85,
-    transition: {
-      duration: 0.28,
-    },
+    scale: 0.9,
+    transition: { duration: 0.2 },
   },
   visible: {
     opacity: 1,
     scale: 1,
     transition: {
-      duration: 0.28,
+      duration: 0.25,
     },
   },
 }
 </script>
 
 <template>
-  <motion.div
-    class="match"
-    :variants="currentMatchVariants"
-    initial="hidden"
-    animate="visible"
-    exit="hidden"
-  >
-    <div class="match-header match__text">
-      <span>Current match</span>
-      <span
-        style="font-weight: 500"
-        :class="{
-          'match__text--negative': diff > 0,
-          'match__text--positive': diff < 0,
-        }"
-        >{{ eloChangeFormatter(diff) + Math.abs(diff) }}s</span
-      >
-    </div>
-
-    <div class="match-opponent">
-      <div class="match-opponent-stats">
-        <div class="match-opponent" style="gap: 6px">
-          <img :src="`https://mineskin.eu/helm/${nickname}/100.png`" class="match-opponent__icon" />
-          <span class="match-opponent-stats__primary">{{ nickname }}</span>
-        </div>
-        <div class="match-opponent">
-          <span class="match__text">{{ elo }} elo</span>
-          <span class="match__text">{{ avg }} avg</span>
-          <span class="match__text">#{{ leaderboard }}</span>
-        </div>
+  <AnimatePresence>
+    <motion.div
+      v-if="isLiveMatch"
+      key="live-match"
+      class="match"
+      :variants="currentMatchVariants"
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+    >
+      <div class="match-header match__text">
+        <span>Current match</span>
+        <span
+          style="font-weight: 500"
+          :class="{
+            'match__text--negative': diff > 0,
+            'match__text--positive': diff < 0,
+          }"
+        >
+          {{ eloChangeFormatter(diff) + Math.abs(diff) }}s
+        </span>
       </div>
-      <img :src="`/icons/splits/${split}.png`" class="match-opponent-split" />
-    </div>
-  </motion.div>
+
+      <div class="match-opponent">
+        <div class="match-opponent-stats">
+          <div class="match-opponent" style="gap: 6px">
+            <img
+              :src="`https://mineskin.eu/helm/${nickname}/100.png`"
+              class="match-opponent__icon"
+            />
+            <span class="match-opponent-stats__primary">{{ nickname }}</span>
+          </div>
+          <div class="match-opponent">
+            <span class="match__text">{{ elo }} elo</span>
+            <span class="match__text">{{ avg }} avg</span>
+            <span class="match__text">#{{ leaderboard }}</span>
+          </div>
+        </div>
+        <img :src="`/icons/splits/${split}.png`" class="match-opponent-split" />
+      </div>
+    </motion.div>
+  </AnimatePresence>
 </template>
 
 <style scoped>
