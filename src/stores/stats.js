@@ -58,19 +58,16 @@ export const useStatsStore = defineStore('stats', {
 
     async userMatchesUpdater(nickname) {
       const userMatches = await getUserMatches(nickname)
-
       if (!userMatches.length) return
 
-      let tempWins = 0
-      let tempLoses = 0
-      let tempEloChange = 0
-      const winTimings = []
-      const latestMatch = userMatches[0]
-      const latestMatchTime = latestMatch.date * 1000
+      // TODO: Move to env variable SESSION_GAP
+      const SESSION_GAP = 6 * 3600 * 1000 // 6 hours
       const NOW = Date.now()
-      const SESSION_GAP = 6 * 3600 * 1000
 
-      if (NOW - latestMatchTime > SESSION_GAP) {
+      const latestMatch = userMatches[0]
+      const latestMatchTimeMs = latestMatch.date * 1000
+
+      if (NOW - latestMatchTimeMs > SESSION_GAP) {
         this.wins = 0
         this.loses = 0
         this.eloChange = 0
@@ -83,66 +80,66 @@ export const useStatsStore = defineStore('stats', {
         return
       }
 
-      const sessionMatches = [latestMatch]
-      let lastMatchTime = latestMatchTime
+      let sessionMatches = [latestMatch]
+      let previousMatchTime = latestMatchTimeMs
 
       for (let i = 1; i < userMatches.length; i++) {
-        const matchTime = userMatches[i].date * 1000
-        if (lastMatchTime - matchTime <= SESSION_GAP) {
-          sessionMatches.push(userMatches[i])
-          lastMatchTime = matchTime
+        const match = userMatches[i]
+        const matchTimeMs = match.date * 1000
+
+        if (previousMatchTime - matchTimeMs <= SESSION_GAP) {
+          sessionMatches.push(match)
+          previousMatchTime = matchTimeMs
         } else {
           break
         }
       }
 
+      let wins = 0
+      let loses = 0
+      let eloChange = 0
+      const winTimings = []
+
       for (const match of sessionMatches) {
-        const isPlayerWinner = match.result.uuid === this.uuid
-        if (isPlayerWinner) {
-          tempWins++
-          if (!match.forfeited) {
-            winTimings.push(match.result.time)
-          }
+        const isWinner = match.result.uuid === this.uuid
+
+        if (isWinner) {
+          wins++
+          if (!match.forfeited) winTimings.push(match.result.time)
         } else if (match.result.uuid !== null) {
-          tempLoses++
+          loses++
         }
-        if (match.changes[0].uuid === this.uuid) {
-          tempEloChange += match.changes[0].change
-        } else {
-          tempEloChange += match.changes[1].change
-        }
+
+        const changeObj = match.changes[0].uuid === this.uuid ? match.changes[0] : match.changes[1]
+
+        eloChange += changeObj.change
       }
 
-      let latestMatchNickname = ''
-      let latestMatchElo = 0
-      let latestMatchResult = 0
-      let latestMatchRank = 0
-
+      let latestMatchOpponent
       if (latestMatch.players[0].uuid !== this.uuid) {
-        latestMatchNickname = latestMatch.players[0].nickname
-        latestMatchElo = latestMatch.players[0].eloRate
-        latestMatchRank = latestMatch.players[0].eloRank
+        latestMatchOpponent = latestMatch.players[0]
       } else {
-        latestMatchNickname = latestMatch.players[1].nickname
-        latestMatchElo = latestMatch.players[1].eloRate
-        latestMatchRank = latestMatch.players[1].eloRank
+        latestMatchOpponent = latestMatch.players[1]
       }
 
-      if (latestMatch.changes[0].uuid === this.uuid) {
-        latestMatchResult = latestMatch.changes[0].change
-      } else {
-        latestMatchResult = latestMatch.changes[1].change
-      }
+      const latestMatchResult =
+        latestMatch.changes[0].uuid === this.uuid
+          ? latestMatch.changes[0].change
+          : latestMatch.changes[1].change
 
-      preloadImage(`https://mineskin.eu/helm/${latestMatchNickname}/100.png`)
-      this.wins = tempWins
-      this.loses = tempLoses
-      this.eloChange = tempEloChange
-      this.winrate = Math.round((tempWins / (tempWins + tempLoses)) * 100) || 0
-      this.avg = msToHMS(winTimings.reduce((a, b) => a + b, 0) / (winTimings.length || 1))
-      this.latestMatchNickname = latestMatchNickname
-      this.latestMatchElo = latestMatchElo
-      this.latestMatchRank = latestMatchRank
+      preloadImage(`https://mineskin.eu/helm/${latestMatchOpponent.nickname}/100.png`)
+
+      this.wins = wins
+      this.loses = loses
+      this.eloChange = eloChange
+      this.winrate = Math.round((wins / (wins + loses)) * 100) || 0
+
+      const avgMs = winTimings.reduce((a, b) => a + b, 0) / (winTimings.length || 1)
+      this.avg = msToHMS(avgMs)
+
+      this.latestMatchNickname = latestMatchOpponent.nickname
+      this.latestMatchElo = latestMatchOpponent.eloRate
+      this.latestMatchRank = latestMatchOpponent.eloRank
       this.latestMatchResult = latestMatchResult
     },
 
