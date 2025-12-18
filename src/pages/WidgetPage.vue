@@ -105,49 +105,11 @@ onMounted(async () => {
       initial="hidden"
       :animate="configStore.isExpanded ? 'extended' : 'visible'"
     >
-      <MinimizedOverlay
-        key="minimized-overlay"
-        v-if="!configStore.isExpanded"
-        :elo="statsStore.elo"
-        :eloRank="statsStore.eloRank"
-        :eloChange="statsStore.eloChange"
-        :rankIcon="statsStore.rankIcon"
-        :advanced="configStore.advancedMinimized"
-        :wins="statsStore.wins"
-        :loses="statsStore.loses"
-        :winrate="statsStore.winrate"
-      />
+      <MinimizedOverlay key="minimized-overlay" v-if="!configStore.isExpanded" />
 
-      <ExpandedOverlay
-        key="expanded-overlay"
-        v-else
-        :nickname="configStore.nickname"
-        :elo="statsStore.elo"
-        :eloRank="statsStore.eloRank"
-        :rank="statsStore.rank"
-        :rankIcon="statsStore.rankIcon"
-        :badge="configStore.badge"
-        :accent="configStore.accent"
-        :eloChange="statsStore.eloChange"
-        :wins="statsStore.wins"
-        :loses="statsStore.loses"
-        :avg="statsStore.avg"
-        :winrate="statsStore.winrate"
-        :opponentNickname="statsStore.latestMatchNickname"
-        :opponentElo="statsStore.latestMatchElo"
-        :opponentRank="statsStore.latestMatchRank"
-        :opponentResult="statsStore.latestMatchResult"
-      />
+      <ExpandedOverlay key="expanded-overlay" v-else />
     </motion.div>
-    <CurrentMatch
-      :isLiveMatch="statsStore.isLiveMatch"
-      :nickname="statsStore.liveMatchNickname"
-      :elo="statsStore.liveMatchElo"
-      :avg="statsStore.liveMatchAvg"
-      :leaderboard="statsStore.liveMatchRank"
-      :split="statsStore.liveMatchSplit"
-      :diff="statsStore.liveMatchDiff"
-    />
+    <CurrentMatch />
   </div>
 </template>
 

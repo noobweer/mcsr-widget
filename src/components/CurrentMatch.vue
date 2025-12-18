@@ -1,16 +1,9 @@
 <script setup>
 import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
+import { useStatsStore } from '@/stores/stats'
 import { AnimatePresence, motion } from 'motion-v'
 
-const { isLiveMatch, nickname, avg, elo, leaderboard, split, diff } = defineProps({
-  isLiveMatch: Boolean,
-  nickname: String,
-  avg: String,
-  elo: Number,
-  leaderboard: Number,
-  split: String,
-  diff: Number,
-})
+const statsStore = useStatsStore()
 
 const currentMatchVariants = {
   hidden: {
@@ -31,7 +24,7 @@ const currentMatchVariants = {
 <template>
   <AnimatePresence>
     <motion.div
-      v-if="isLiveMatch"
+      v-if="statsStore.isLiveMatch"
       key="live-match"
       class="match"
       :variants="currentMatchVariants"
@@ -44,11 +37,11 @@ const currentMatchVariants = {
         <span
           style="font-weight: 500"
           :class="{
-            'match__text--negative': diff > 0,
-            'match__text--positive': diff < 0,
+            'match__text--negative': statsStore.liveMatchDiff > 0,
+            'match__text--positive': statsStore.liveMatchDiff < 0,
           }"
         >
-          {{ eloChangeFormatter(diff) + Math.abs(diff) }}s
+          {{ eloChangeFormatter(statsStore.liveMatchDiff) + Math.abs(statsStore.liveMatchDiff) }}s
         </span>
       </div>
 
@@ -56,18 +49,18 @@ const currentMatchVariants = {
         <div class="match-opponent-stats">
           <div class="match-opponent" style="gap: 6px">
             <img
-              :src="`https://mineskin.eu/helm/${nickname}/100.png`"
+              :src="`https://mineskin.eu/helm/${statsStore.liveMatchNickname}/100.png`"
               class="match-opponent__icon"
             />
-            <span class="match-opponent-stats__primary">{{ nickname }}</span>
+            <span class="match-opponent-stats__primary">{{ statsStore.liveMatchNickname }}</span>
           </div>
           <div class="match-opponent">
-            <span class="match__text">{{ elo }} elo</span>
-            <span class="match__text">{{ avg }} avg</span>
-            <span class="match__text">#{{ leaderboard }}</span>
+            <span class="match__text">{{ statsStore.liveMatchElo }} elo</span>
+            <span class="match__text">{{ statsStore.liveMatchAvg }} avg</span>
+            <span class="match__text">#{{ statsStore.liveMatchRank }}</span>
           </div>
         </div>
-        <img :src="`/icons/splits/${split}.png`" class="match-opponent-split" />
+        <img :src="`/icons/splits/${statsStore.liveMatchSplit}.png`" class="match-opponent-split" />
       </div>
     </motion.div>
   </AnimatePresence>

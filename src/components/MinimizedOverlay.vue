@@ -1,24 +1,18 @@
 <script setup>
 import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
+import { useConfigStore } from '@/stores/config'
+import { useStatsStore } from '@/stores/stats'
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
-const { elo, eloRank, rankIcon, eloChange, advanced, wins, loses, winrate } = defineProps({
-  elo: Number,
-  eloRank: Number,
-  rankIcon: String,
-  eloChange: Number,
-  advanced: Boolean,
-  wins: Number,
-  loses: Number,
-  winrate: Number,
-})
+const statsStore = useStatsStore()
+const configStore = useConfigStore()
 
-const changeCounter = useMotionValue(Math.abs(eloChange))
+const changeCounter = useMotionValue(Math.abs(statsStore.eloChange))
 const changeRounded = useTransform(() => Math.round(changeCounter.get()))
 
 watch(
-  () => eloChange,
+  () => statsStore.eloChange,
   (newEloChange) => {
     animate(changeCounter, Math.abs(newEloChange), {
       duration: 0.5,
@@ -26,11 +20,11 @@ watch(
   },
 )
 
-const eloCounter = useMotionValue(elo)
+const eloCounter = useMotionValue(statsStore.elo)
 const eloRounded = useTransform(() => Math.round(eloCounter.get()))
 
 watch(
-  () => elo,
+  () => statsStore.elo,
   (newElo) => {
     animate(eloCounter, newElo, {
       duration: 0.5,
@@ -38,11 +32,11 @@ watch(
   },
 )
 
-const leaderboardCounter = useMotionValue(eloRank)
+const leaderboardCounter = useMotionValue(statsStore.eloRank)
 const leaderboardRounded = useTransform(() => Math.round(leaderboardCounter.get()))
 
 watch(
-  () => eloRank,
+  () => statsStore.eloRank,
   (newRank) => {
     animate(leaderboardCounter, newRank, {
       duration: 0.5,
@@ -56,27 +50,31 @@ watch(
     <div class="miminized-info">
       <div class="miminized-info-rank">
         <img
-          :src="`/icons/${rankIcon || 'coal'}.png`"
+          :src="`/icons/ranks/${statsStore.rankIcon || 'coal'}.png`"
           alt="rank icon"
-          :class="advanced ? 'miminized-info-rank__icon_small' : 'miminized-info-rank__icon_large'"
+          :class="
+            configStore.advancedMinimized
+              ? 'miminized-info-rank__icon_small'
+              : 'miminized-info-rank__icon_large'
+          "
         />
         <span class="miminized-info-rank__text"><RowValue :value="eloRounded" /> elo</span>
       </div>
       <span
         class="miminized-info__text"
         :class="{
-          'miminized-info__text--positive': eloChange > 0,
-          'miminized-info__text--negative': eloChange < 0,
+          'miminized-info__text--positive': statsStore.eloChange > 0,
+          'miminized-info__text--negative': statsStore.eloChange < 0,
         }"
-        >{{ eloChangeFormatter(eloChange) }}<RowValue :value="changeRounded"
+        >{{ eloChangeFormatter(statsStore.eloChange) }}<RowValue :value="changeRounded"
       /></span>
     </div>
-    <div v-if="advanced" class="stats stats__text">
+    <div v-if="configStore.advancedMinimized" class="stats stats__text">
       <div class="stats-matches">
-        <span>{{ wins }}W</span>
-        <span>{{ loses }}L</span>
+        <span>{{ statsStore.wins }}W</span>
+        <span>{{ statsStore.loses }}L</span>
       </div>
-      <span>{{ winrate }}%</span>
+      <span>{{ statsStore.winrate }}%</span>
       <span>#<RowValue :value="leaderboardRounded" /></span>
     </div>
   </div>
