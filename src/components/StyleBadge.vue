@@ -16,13 +16,13 @@ const { type } = defineProps({
 <style scoped>
 .badge {
   display: flex;
-  padding: 0 0.5rem;
+  padding: 0 0.25rem;
   justify-content: center;
   align-items: center;
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
   color: #fff;
   font-size: 0.875rem;
   font-weight: 500;
-  line-height: 1.25rem;
+  line-height: 1rem;
 }
 </style>

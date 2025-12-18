@@ -2,7 +2,6 @@ import { eloToRank } from '@/lib/eloToRank'
 import { getLiveMatch } from '@/lib/getLiveMatch'
 import { getUserInfo } from '@/lib/getUserInfo'
 import { getUserMatches } from '@/lib/getUserMatches'
-import { getUserSeasonTimings } from '@/lib/getUserSeasonTimings'
 import { msToHMS } from '@/lib/msToHMS'
 import { opponentSplitDiff } from '@/lib/opponentSplitDiff'
 import { preloadImage } from '@/lib/preloadImage'
@@ -41,9 +40,6 @@ export const useStatsStore = defineStore('stats', {
 
     _intervalId: null,
     __intervalId: null,
-
-    _opponentLocks: {},
-    _opponentCache: {},
   }),
   actions: {
     async userInfoUpdater(nickname) {
@@ -154,44 +150,24 @@ export const useStatsStore = defineStore('stats', {
       const allUUIDs = Object.keys(liveMatch.data)
       const opponentUUID = allUUIDs.find((id) => id !== uuid)
 
-      if (opponentUUID) {
-        if (this.liveMatchUUID !== opponentUUID) {
-          this.resetOpponentData()
-          this.liveMatchUUID = opponentUUID
+      if (opponentUUID && this.liveMatchUUID !== opponentUUID) {
+        this.liveMatchUUID = opponentUUID
+
+        const opponentInfo = await getUserInfo(opponentUUID)
+        const avgTime = Math.round(
+          opponentInfo.seasonStatistics.completionTime.ranked /
+            opponentInfo.seasonStatistics.completions.ranked,
+        )
+
+        const opponentData = {
+          nickname: opponentInfo.nickname,
+          elo: opponentInfo.elo,
+          rank: opponentInfo.eloRank,
+          avg: msToHMS(avgTime),
         }
 
-        if (this._opponentCache[opponentUUID]) {
-          this.applyOpponentData(this._opponentCache[opponentUUID])
-        } else if (!this._opponentLocks[opponentUUID]) {
-          this._opponentLocks[opponentUUID] = true
-          try {
-            const [opponentInfo, opponentTimings] = await Promise.all([
-              getUserInfo(opponentUUID),
-              getUserSeasonTimings(opponentUUID),
-            ])
-
-            const avgTime =
-              opponentTimings.length > 0
-                ? Math.round(opponentTimings.reduce((a, b) => a + b, 0) / opponentTimings.length)
-                : 0
-
-            const opponentData = {
-              nickname: opponentInfo.nickname,
-              elo: opponentInfo.elo,
-              rank: opponentInfo.eloRank,
-              avg: msToHMS(avgTime),
-            }
-
-            this._opponentCache[opponentUUID] = opponentData
-            this.applyOpponentData(opponentData)
-            preloadImage(`https://mineskin.eu/helm/${opponentInfo.nickname}/100.png`)
-          } catch (err) {
-            console.error('ERROR LOADING OPPONENT DATA:', err)
-            this.liveMatchNickname = 'Unknown Player'
-          } finally {
-            this._opponentLocks[opponentUUID] = false
-          }
-        }
+        this.applyOpponentData(opponentData)
+        preloadImage(`https://mineskin.eu/helm/${opponentInfo.nickname}/100.png`)
       }
 
       const playerData = liveMatch.data[uuid]

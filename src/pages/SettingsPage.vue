@@ -1,9 +1,5 @@
 <script setup>
 import CopyIcon from '@/assets/icons/copy.svg'
-
-import MinimizedOverlay from '@/components/MinimizedOverlay.vue'
-import PreviewExpandedLatest from '@/components/PreviewExpandedLatest.vue'
-import PreviewExpandedToday from '@/components/PreviewExpandedToday.vue'
 import StyleBadge from '@/components/StyleBadge.vue'
 import { postWidgetCustomizations } from '@/lib/postWidgetCustomizations'
 import { ref } from 'vue'
@@ -35,9 +31,9 @@ const selectedAccent = ref(localStorage.getItem('selectedAccent') || 'FFFFFF')
 const styles = [
   { id: 0, label: 'All states', badge: 'anim', desc: 'Minimized, Latest match, Today stats' },
   { id: 1, label: '2 states', badge: 'anim', desc: 'Latest match, Today stats' },
-  { id: 2, label: 'Only Elo counter', badge: 'stat', desc: '' },
-  { id: 3, label: 'Only Latest match', badge: 'stat', desc: '' },
-  { id: 4, label: 'Only Today stats', badge: 'stat', desc: '' },
+  { id: 2, label: 'Minimized', badge: 'stat', desc: '' },
+  { id: 3, label: 'Expanded - Latest match', badge: 'stat', desc: '' },
+  { id: 4, label: 'Expanded - Today stats', badge: 'stat', desc: '' },
 ]
 
 const selectedStyle = ref(Number(localStorage.getItem('selectedStyle')) || 0)
@@ -63,9 +59,7 @@ const copyWidgetUrl = () => {
   const widgetUrl = `${window.location.origin}/widget?nickname=${nickname.value}&badge=${selectedBadge.value}&rate=${selectedRate.value}&accent=${selectedAccent.value}&state=${selectedStyle.value}`
   navigator.clipboard.writeText(widgetUrl)
 
-  toast.success(
-    'Widget URL copied to clipboard! Set your browser source width to 290px and height to 196px.',
-  )
+  toast.success('Overlay URL copied to clipboard!\nSet your browser source to 290×196 px.')
 
   postWidgetCustomizations({
     nickname: nickname.value,
@@ -197,7 +191,7 @@ const copyDiscord = () => {
               <span class="style-item__desc">{{ styles[1].desc }}</span>
             </div>
           </div>
-          <div class="settings-paramets-section-styles-states-short">
+          <div class="settings-paramets-section-styles-states">
             <!-- Minimized style -->
             <div
               class="style-item"
@@ -276,112 +270,22 @@ const copyDiscord = () => {
         </div>
       </div>
     </div>
-
-    <div class="settings-preview">
-      <div class="settings-preview-header">
-        <span class="settings-parametrs-section__text">Preview</span>
-
-        <!-- Links -->
-        <div class="settings-preview-header-links">
-          <div class="link-button" @click="copyDiscord">
-            <img src="/icons/discord.svg" alt="" />
-          </div>
-          <a
-            class="link-button"
-            href="https://github.com/noobweer/mcsr-widget"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src="/icons/github.svg" alt="" />
-          </a>
-        </div>
-      </div>
-
-      <div class="preview">
-        <div class="preview-widgets">
-          <!-- Minimized example -->
-          <div class="preview-widgets-minimized">
-            <MinimizedOverlay
-              :elo="exampleData.elo"
-              :rankIcon="exampleData.rankIcon"
-              :eloChange="exampleData.eloChange"
-            />
-          </div>
-
-          <!-- Expanded latest match example -->
-          <div class="preview-widgets-expanded">
-            <PreviewExpandedLatest
-              :nickname="exampleData.nickname"
-              :elo="exampleData.elo"
-              :rank="exampleData.rank"
-              :rankIcon="exampleData.rankIcon"
-              :badge="selectedBadge"
-              :accent="`#${selectedAccent}`"
-              :eloChange="exampleData.eloChange"
-              :wins="exampleData.wins"
-              :loses="exampleData.loses"
-              :avg="exampleData.avg"
-              :winrate="exampleData.winrate"
-              :opponentNickname="exampleData.opponentNickname"
-              :opponentElo="exampleData.opponentElo"
-              :opponentResult="exampleData.opponentResult"
-            />
-          </div>
-
-          <!-- Expanded today stats example -->
-          <div class="preview-widgets-expanded-extra">
-            <PreviewExpandedToday
-              :nickname="exampleData.nickname"
-              :elo="exampleData.elo"
-              :rank="exampleData.rank"
-              :rankIcon="exampleData.rankIcon"
-              :winrate="exampleData.winrate"
-              :badge="selectedBadge"
-              :accent="`#${selectedAccent}`"
-              :eloChange="exampleData.eloChange"
-              :wins="exampleData.wins"
-              :loses="exampleData.loses"
-              :avg="exampleData.avg"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <style scoped>
 .settings {
   display: flex;
-  width: 100vw;
-  height: 100vh;
-  padding: 1rem;
-  justify-content: center;
-  align-items: center;
   gap: 0.625rem;
-  flex: 1 0 0;
-  align-self: stretch;
+  padding: 1rem;
   background: black;
 }
 .settings-parametrs {
   display: flex;
+  width: 100%;
+  height: 100%;
   flex-direction: column;
-  align-items: center;
   gap: 0.625rem;
-  flex: 1 0 0;
-  align-self: stretch;
-}
-.settings-preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  align-self: stretch;
-}
-.settings-preview-header-links {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
 }
 .link-button {
   display: flex;
@@ -448,13 +352,12 @@ const copyDiscord = () => {
 }
 .variants-item {
   display: flex;
-  width: 7rem;
-  height: 5.75rem;
-  padding: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0rem;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
   border-radius: 0.25rem;
   background: #1b1b1b;
   cursor: pointer;
@@ -463,7 +366,7 @@ const copyDiscord = () => {
   background: #131313;
 }
 .variants-item.active {
-  box-shadow: inset 0 0 0 2px white;
+  box-shadow: inset 0 0 0 2px grey;
 }
 .variants-item__icon {
   width: 3rem;
@@ -509,7 +412,7 @@ const copyDiscord = () => {
   background: #131313;
 }
 .palette.active {
-  box-shadow: inset 0 0 0 2px white;
+  box-shadow: inset 0 0 0 2px grey;
 }
 .accent-item.active {
   box-shadow: inset 0 0 0 2px white;
@@ -602,16 +505,13 @@ const copyDiscord = () => {
 }
 .settings-save {
   display: flex;
+  min-height: 100%;
   flex-direction: column;
   justify-content: flex-end;
-  align-items: center;
-  gap: 0.625rem;
-  flex: 1 0 0;
   align-self: stretch;
 }
 .settings-save-button {
   display: flex;
-  padding: 0.375rem 0;
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
@@ -625,7 +525,7 @@ const copyDiscord = () => {
 }
 .settings-save-button__text {
   color: #fff;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   line-height: 1.25rem;
   letter-spacing: -0.00438rem;
@@ -634,91 +534,23 @@ const copyDiscord = () => {
   width: 1.5rem;
   height: 1.5rem;
 }
-.settings-preview {
-  display: flex;
-  padding: 1rem;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.625rem;
-  flex: 1 0 0;
-  align-self: stretch;
-  border-radius: 0.5rem;
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url(/src/assets/icons/back.jpg) 50% / cover no-repeat;
-}
-.preview {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.625rem;
-  flex: 1 0 0;
-  align-self: stretch;
-}
-.preview-widgets {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-.preview-widgets-minimized {
-  display: flex;
-  overflow: hidden;
-  gap: 1rem;
-  border-radius: 2rem;
-  background: #000;
-  height: 48px;
-  width: 236px;
-  padding: 0.5rem 1rem;
-}
-.preview-widgets-expanded {
-  display: flex;
-  overflow: hidden;
-  gap: 1rem;
-  border-radius: 2rem;
-  background: #000;
-  height: 164px;
-  width: 290px;
-  padding: 1rem 1.5rem;
-}
-.preview-widgets-expanded-extra {
-  display: flex;
-  overflow: hidden;
-  gap: 1rem;
-  border-radius: 2rem;
-  background: #000;
-  height: 196px;
-  width: 290px;
-  padding: 1rem 1.5rem;
-}
 .settings-paramets-section-styles {
   display: flex;
-  align-items: flex-start;
-  align-content: flex-start;
+  width: 100%;
   gap: 0.5rem;
-  align-self: stretch;
   flex-wrap: wrap;
 }
 .settings-paramets-section-styles-states {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  width: 100%;
   gap: 0.5rem;
-}
-.settings-paramets-section-styles-states-short {
-  display: flex;
-  height: 8rem;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
 }
 .style-item {
   display: flex;
-  width: 17.125rem;
   padding: 0.5rem;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.25rem;
+  gap: 0.5rem;
   border-radius: 0.25rem;
   background: #1b1b1b;
   cursor: pointer;
@@ -727,24 +559,25 @@ const copyDiscord = () => {
   background: #131313;
 }
 .style-item.active {
-  box-shadow: inset 0 0 0 2px white;
+  box-shadow: inset 0 0 0 2px grey;
 }
 .style-item-info {
   display: flex;
+  gap: 1rem;
   justify-content: space-between;
   align-items: flex-start;
   align-self: stretch;
 }
 .style-item__title {
   color: #fff;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 500;
-  line-height: 1.25rem;
+  line-height: 1rem;
 }
 .style-item__desc {
   color: rgba(255, 255, 255, 0.4);
   font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.25rem;
+  font-weight: 400;
+  line-height: 0.875rem;
 }
 </style>

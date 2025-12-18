@@ -1,6 +1,6 @@
 <script setup>
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
-import { defineProps, watch } from 'vue'
+import { watch } from 'vue'
 
 const { percentage, accent } = defineProps({
   percentage: Number,
