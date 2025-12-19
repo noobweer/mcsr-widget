@@ -104,7 +104,7 @@ const currentMatchVariants = {
   display: flex;
   flex-direction: column;
   width: 176px;
-  gap: 4px;
+  gap: 6px;
 }
 .match-opponent-stats__primary {
   white-space: nowrap;

@@ -1,5 +1,7 @@
 <script setup>
 import CopyIcon from '@/assets/icons/copy.svg'
+import SettingsBadge from '@/components/SettingsBadge.vue'
+import SettingsNickname from '@/components/SettingsNickname.vue'
 import StyleBadge from '@/components/StyleBadge.vue'
 import { postWidgetCustomizations } from '@/lib/postWidgetCustomizations'
 import { ref } from 'vue'
@@ -106,33 +108,9 @@ const copyDiscord = () => {
 <template>
   <div class="settings">
     <div class="settings-parametrs">
-      <!-- Minecraft nickname -->
-      <div class="settings-parametrs-section">
-        <span class="settings-parametrs-section__text">Minecraft nickname</span>
-        <input
-          type="text"
-          v-model="nickname"
-          placeholder="Enter your Minecraft nickname"
-          class="settings-parametrs-section-input"
-        />
-      </div>
+      <SettingsNickname />
 
-      <!-- Corner badge -->
-      <div class="settings-parametrs-section">
-        <span class="settings-parametrs-section__text">Corner badge</span>
-        <div class="settings-parametrs-section-variants">
-          <div
-            v-for="badge in badges"
-            :key="badge.id"
-            class="variants-item"
-            :class="{ active: selectedBadge === badge.id }"
-            @click="selectedBadge = badge.id"
-          >
-            <img :src="`/icons/${badge.icon}.png`" alt="variant icon" class="variants-item__icon" />
-            <span class="variants-item__label">{{ badge.label }}</span>
-          </div>
-        </div>
-      </div>
+      <SettingsBadge />
 
       <!-- Accent color -->
       <div class="settings-parametrs-section">
