@@ -56,8 +56,8 @@ const currentMatchVariants = {
           </div>
           <div class="match-opponent">
             <span class="match__text">{{ statsStore.liveMatchElo }} elo</span>
-            <span class="match__text">{{ statsStore.liveMatchAvg }} avg</span>
             <span class="match__text">#{{ statsStore.liveMatchRank }}</span>
+            <span class="match__text">{{ statsStore.liveMatchAvg }} avg</span>
           </div>
         </div>
         <img :src="`/icons/splits/${statsStore.liveMatchSplit}.png`" class="match-opponent-split" />
@@ -98,13 +98,13 @@ const currentMatchVariants = {
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 8px;
+  gap: 10px;
 }
 .match-opponent-stats {
   display: flex;
   flex-direction: column;
   width: 176px;
-  gap: 2px;
+  gap: 4px;
 }
 .match-opponent-stats__primary {
   white-space: nowrap;

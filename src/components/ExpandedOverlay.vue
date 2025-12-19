@@ -91,28 +91,26 @@ onUnmounted(() => {
       </div>
 
       <img
-        v-if="badge === 1"
+        v-if="configStore.badge === 1"
         src="/icons/ranked.png"
         alt="ranked icon"
         class="expanded-info__icon"
       />
-      <WinrateBadge v-else-if="badge === 2" :percentage="winrate" :accent="accent" />
+      <WinrateBadge
+        v-else-if="configStore.badge === 2"
+        :accent="configStore.accent"
+        :percentage="statsStore.winrate"
+      />
       <img
         v-else
-        :src="`https://mineskin.eu/helm/${nickname}/100.png`"
+        :src="`https://mineskin.eu/helm/${configStore.nickname}/100.png`"
         alt="player head"
         class="expanded-info__head"
       />
     </div>
 
-    <LatestMatch
-      v-if="!configStore.isLatest"
-      :elo="opponentElo"
-      :nickname="opponentNickname"
-      :rank="opponentRank"
-      :result="opponentResult"
-    />
-    <TodayStats v-else :accent="accent" :wins="wins" :loses="loses" :elo="eloChange" :avg="avg" />
+    <LatestMatch v-if="!configStore.isLatest" />
+    <TodayStats v-else />
   </div>
 </template>
 
