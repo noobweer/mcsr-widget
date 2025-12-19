@@ -35,7 +35,7 @@ const nickname = ref('')
   padding: 0.5rem 1rem;
   border-radius: 8px;
   border: 1.5px solid #353535;
-  background: black;
+  background: #1b1b1b;
   color: white;
   font-size: 20px;
   line-height: 28px;

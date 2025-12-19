@@ -55,9 +55,10 @@ const selectedBadge = ref(Number(localStorage.getItem('selectedBadge')) || 1)
   padding: 8px;
   border-radius: 8px;
   background: #1b1b1b;
+  transition: opacity 0.2s ease;
 }
 .badge-selector__item:hover {
-  background: #131313;
+  opacity: 80%;
 }
 .badge-selector__item--active {
   box-shadow: inset 0 0 0 1.5px white;

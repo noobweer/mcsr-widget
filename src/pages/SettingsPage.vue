@@ -1,8 +1,9 @@
 <script setup>
 import CopyIcon from '@/assets/icons/copy.svg'
+import SettingsAccent from '@/components/SettingsAccent.vue'
 import SettingsBadge from '@/components/SettingsBadge.vue'
+import SettingsMode from '@/components/SettingsMode.vue'
 import SettingsNickname from '@/components/SettingsNickname.vue'
-import StyleBadge from '@/components/StyleBadge.vue'
 import { postWidgetCustomizations } from '@/lib/postWidgetCustomizations'
 import { ref } from 'vue'
 import { useToast } from 'vue-toastification'
@@ -112,135 +113,12 @@ const copyDiscord = () => {
 
       <SettingsBadge />
 
-      <!-- Accent color -->
-      <div class="settings-parametrs-section">
-        <span class="settings-parametrs-section__text">Accent color</span>
-        <div class="settings-paramets-accents">
-          <div
-            class="palette"
-            @click="openColorPicker"
-            :class="{ active: !accents.some((a) => a.hex === selectedAccent) }"
-          >
-            <img src="/icons/palette.svg" alt="palette" />
-          </div>
-          <input
-            type="color"
-            ref="colorInput"
-            v-model="color"
-            @input="saveAccent"
-            style="display: none"
-          />
-          <div
-            v-for="accent in accents"
-            :key="accent.hex"
-            class="accent-item"
-            :class="{ active: selectedAccent === accent.hex }"
-            :style="{ backgroundColor: `#${accent.hex}` }"
-            @click="selectedAccent = accent.hex"
-          ></div>
-        </div>
-      </div>
+      <SettingsAccent />
 
-      <!-- Widget style -->
-      <div class="settings-parametrs-section">
-        <span class="settings-parametrs-section__text">Widget style</span>
-        <div class="settings-paramets-section-styles">
-          <div class="settings-paramets-section-styles-states">
-            <div
-              class="style-item"
-              @click="selectedStyle = styles[0].id"
-              :class="{ active: selectedStyle === styles[0].id }"
-            >
-              <div class="style-item-info">
-                <span class="style-item__title">{{ styles[0].label }}</span>
-                <StyleBadge :type="styles[0].badge" />
-              </div>
-              <span class="style-item__desc">{{ styles[0].desc }}</span>
-            </div>
-            <div
-              class="style-item"
-              @click="selectedStyle = styles[1].id"
-              :class="{ active: selectedStyle === styles[1].id }"
-            >
-              <div class="style-item-info">
-                <span class="style-item__title">{{ styles[1].label }}</span>
-                <StyleBadge :type="styles[1].badge" />
-              </div>
-              <span class="style-item__desc">{{ styles[1].desc }}</span>
-            </div>
-          </div>
-          <div class="settings-paramets-section-styles-states">
-            <!-- Minimized style -->
-            <div
-              class="style-item"
-              @click="selectedStyle = styles[2].id"
-              :class="{ active: selectedStyle === styles[2].id }"
-            >
-              <div class="style-item-info">
-                <span class="style-item__title">{{ styles[2].label }}</span>
-                <StyleBadge :type="styles[2].badge" />
-              </div>
-            </div>
-
-            <!-- Latest match style -->
-            <div
-              class="style-item"
-              @click="selectedStyle = styles[3].id"
-              :class="{ active: selectedStyle === styles[3].id }"
-            >
-              <div class="style-item-info">
-                <span class="style-item__title">{{ styles[3].label }}</span>
-                <StyleBadge :type="styles[3].badge" />
-              </div>
-            </div>
-
-            <!-- Today stats style -->
-            <div
-              class="style-item"
-              @click="selectedStyle = styles[4].id"
-              :class="{ active: selectedStyle === styles[4].id }"
-            >
-              <div class="style-item-info">
-                <span class="style-item__title">{{ styles[4].label }}</span>
-                <StyleBadge :type="styles[4].badge" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <SettingsMode />
 
       <!-- Animation rate -->
-      <div class="settings-parametrs-section" v-if="selectedStyle === 0 || selectedStyle === 1">
-        <div class="settings-parametrs-section-header">
-          <span class="settings-parametrs-section__text">Animation rate</span>
-          <span class="settings-parametrs-section__text-scnd">in seconds</span>
-        </div>
 
-        <div class="settings-parametrs-rates-container">
-          <div class="settings-parametrs-rates-controls">
-            <button class="rate-input-button-left" @click="selectedRate -= 5">
-              <img src="/icons/minus.svg" alt="" />
-            </button>
-            <input class="rate-input" v-model="selectedRate" />
-            <button class="rate-input-button-right" @click="selectedRate += 5">
-              <img src="/icons/plus.svg" alt="" />
-            </button>
-          </div>
-
-          <div class="settings-parametrs-rates">
-            <div
-              v-for="rate in rates"
-              :key="rate.value"
-              class="rate-item rate-item__text"
-              @click="selectedRate = rate.value"
-            >
-              {{ rate.value }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Widget link -->
       <div class="settings-save">
         <div class="settings-save-button" @click="copyWidgetUrl">
           <CopyIcon class="settings-save-button_icon" />
@@ -254,6 +132,7 @@ const copyDiscord = () => {
 <style scoped>
 .settings {
   display: flex;
+  height: 100vh;
   gap: 0.625rem;
   padding: 1rem;
   background: black;
@@ -483,9 +362,7 @@ const copyDiscord = () => {
 }
 .settings-save {
   display: flex;
-  min-height: 100%;
   flex-direction: column;
-  justify-content: flex-end;
   align-self: stretch;
 }
 .settings-save-button {
