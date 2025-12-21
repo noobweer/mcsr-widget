@@ -1,7 +1,14 @@
 <script setup>
 import { ref, watch } from 'vue'
 
-const STORAGE_KEY = 'selectedAccent'
+const props = defineProps({
+  modelValue: {
+    type: String,
+    required: true, // "FFFFFF"
+  },
+})
+
+const emit = defineEmits(['update:modelValue'])
 
 const accents = [
   { id: 'white', hex: 'FFFFFF' },
@@ -14,37 +21,43 @@ const accents = [
   { id: 'pink', hex: 'FF63BA' },
 ]
 
-// начальное значение
-const selectedAccent = ref(localStorage.getItem(STORAGE_KEY) ?? 'FFFFFF')
-
-const color = ref(`#${selectedAccent.value}`)
 const colorInput = ref(null)
+const color = ref(`#${props.modelValue}`)
 
 const openColorPicker = () => {
   colorInput.value?.click()
 }
 
-const saveAccent = () => {
-  selectedAccent.value = color.value.slice(1).toUpperCase()
+const setAccent = (hex) => {
+  emit('update:modelValue', hex.toUpperCase())
 }
 
-watch(selectedAccent, (value) => {
-  localStorage.setItem(STORAGE_KEY, value)
-  color.value = `#${value}`
-})
+const saveAccent = () => {
+  setAccent(color.value.slice(1))
+}
+
+watch(
+  () => props.modelValue,
+  (value) => {
+    color.value = `#${value}`
+  },
+)
 </script>
 
 <template>
   <div class="accent">
     <span class="accent__label">Accent color</span>
+
     <div class="accent-selector">
+      <!-- custom color -->
       <div
         class="accent-selector__palette"
         @click="openColorPicker"
-        :class="{ active: !accents.some((a) => a.hex === selectedAccent) }"
+        :class="{ active: !accents.some((a) => a.hex === modelValue) }"
       >
         <img src="/icons/palette.svg" />
       </div>
+
       <input
         type="color"
         ref="colorInput"
@@ -52,14 +65,16 @@ watch(selectedAccent, (value) => {
         @input="saveAccent"
         style="display: none"
       />
+
+      <!-- preset colors -->
       <div
         v-for="accent in accents"
         :key="accent.hex"
         class="accent-selector__item"
-        :class="{ 'accent-selector__item--active': selectedAccent === accent.hex }"
+        :class="{ 'accent-selector__item--active': modelValue === accent.hex }"
         :style="{ backgroundColor: `#${accent.hex}` }"
-        @click="selectedAccent = accent.hex"
-      ></div>
+        @click="setAccent(accent.hex)"
+      />
     </div>
   </div>
 </template>

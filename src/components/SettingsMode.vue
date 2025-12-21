@@ -1,8 +1,14 @@
 <script setup>
-import { ref, watch } from 'vue'
 import StyleBadge from './StyleBadge.vue'
 
-const STORAGE_KEY = 'selectedMode'
+const { modelValue } = defineProps({
+  modelValue: {
+    type: Number,
+    required: true,
+  },
+})
+
+const emit = defineEmits(['update:modelValue'])
 
 const animatedModes = [
   { id: 0, label: 'Complete', desc: 'Compact, Last match, Today session', badge: 'anim' },
@@ -15,20 +21,15 @@ const staticModes = [
   { id: 4, label: 'Today session', badge: 'stat' },
 ]
 
-const selectedMode = ref(Number(localStorage.getItem(STORAGE_KEY)) || 0)
-
 const selectMode = (id) => {
-  selectedMode.value = id
+  emit('update:modelValue', id)
 }
-
-watch(selectedMode, (value) => {
-  localStorage.setItem(STORAGE_KEY, value)
-})
 </script>
 
 <template>
   <div class="mode">
     <span class="mode__label">Overlay mode</span>
+
     <div class="mode-selector">
       <!-- animated — first row -->
       <div class="mode-selector__row">
@@ -36,7 +37,7 @@ watch(selectedMode, (value) => {
           v-for="animatedMode in animatedModes"
           :key="animatedMode.id"
           class="mode-selector__item"
-          :class="{ 'mode-selector__item--active': selectedMode === animatedMode.id }"
+          :class="{ 'mode-selector__item--active': modelValue === animatedMode.id }"
           @click="selectMode(animatedMode.id)"
         >
           <div class="mode-selector__item__label">
@@ -55,7 +56,7 @@ watch(selectedMode, (value) => {
           v-for="staticMode in staticModes"
           :key="staticMode.id"
           class="mode-selector-static__item mode-selector__item__label"
-          :class="{ 'mode-selector-static__item--active': selectedMode === staticMode.id }"
+          :class="{ 'mode-selector-static__item--active': modelValue === staticMode.id }"
           @click="selectMode(staticMode.id)"
         >
           {{ staticMode.label }}
@@ -97,7 +98,6 @@ watch(selectedMode, (value) => {
   background: #1b1b1b;
   flex: 1;
   min-width: 274px;
-  gap: 4px;
   padding: 8px 12px;
   border-radius: 8px;
   transition: opacity 0.2s ease;

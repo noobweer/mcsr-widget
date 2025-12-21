@@ -1,27 +1,40 @@
 <script setup>
-import { ref } from 'vue'
+const { modelValue } = defineProps({
+  modelValue: {
+    type: Number,
+    required: true,
+  },
+})
+
+const emit = defineEmits(['update:modelValue'])
 
 const badges = [
   { id: 1, label: 'Ranked Icon', icon: 'ranked' },
   { id: 2, label: 'Winrate Circle', icon: 'winrate' },
   { id: 3, label: 'Player Head', icon: 'head' },
 ]
-const selectedBadge = ref(Number(localStorage.getItem('selectedBadge')) || 1)
+
+const selectBadge = (id) => {
+  emit('update:modelValue', id)
+}
 </script>
 
 <template>
   <div class="badge">
     <span class="badge__label">Corner badge</span>
+
     <div class="badge-selector">
       <div
         v-for="badge in badges"
         :key="badge.id"
         class="badge-selector__item"
-        :class="{ 'badge-selector__item--active': selectedBadge === badge.id }"
-        @click="selectedBadge = badge.id"
+        :class="{ 'badge-selector__item--active': modelValue === badge.id }"
+        @click="selectBadge(badge.id)"
       >
         <img :src="`/icons/${badge.icon}.png`" class="badge-selector__icon" />
-        <span class="badge-selector__label">{{ badge.label }}</span>
+        <span class="badge-selector__label">
+          {{ badge.label }}
+        </span>
       </div>
     </div>
   </div>
@@ -47,11 +60,11 @@ const selectedBadge = ref(Number(localStorage.getItem('selectedBadge')) || 1)
 }
 .badge-selector__item {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
   cursor: pointer;
   width: 100%;
-  gap: 4px;
+  gap: 8px;
   padding: 8px;
   border-radius: 8px;
   background: #1b1b1b;
@@ -64,8 +77,8 @@ const selectedBadge = ref(Number(localStorage.getItem('selectedBadge')) || 1)
   box-shadow: inset 0 0 0 1.5px white;
 }
 .badge-selector__icon {
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
   border-radius: 4px;
 }
 .badge-selector__label {
