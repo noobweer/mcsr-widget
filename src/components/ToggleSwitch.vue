@@ -4,7 +4,7 @@ import { computed } from 'vue'
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   disabled: {
     type: Boolean,

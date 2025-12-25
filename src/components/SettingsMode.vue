@@ -118,7 +118,7 @@ const selectMode = (id) => {
 }
 .mode-selector__item__desc {
   color: rgba(255, 255, 255, 0.4);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 20px;
   font-weight: 500;
 }

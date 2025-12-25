@@ -1,7 +1,16 @@
 <script setup>
-import { ref } from 'vue'
+const { modelValue } = defineProps({
+  modelValue: {
+    type: String,
+    default: '',
+  },
+})
 
-const nickname = ref('')
+const emit = defineEmits(['update:modelValue'])
+
+const update = (e) => {
+  emit('update:modelValue', e.target.value)
+}
 </script>
 
 <template>
@@ -9,7 +18,8 @@ const nickname = ref('')
     <span class="nickname-input__label">Minecraft nickname</span>
     <input
       type="text"
-      v-model="nickname"
+      :value="modelValue"
+      @input="update"
       placeholder="Enter your Minecraft nickname"
       class="nickname-input__field"
     />

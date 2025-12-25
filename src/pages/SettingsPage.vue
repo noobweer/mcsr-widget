@@ -2,35 +2,40 @@
 import CopyIcon from '@/assets/icons/copy.svg'
 import SettingsAccent from '@/components/SettingsAccent.vue'
 import SettingsBadge from '@/components/SettingsBadge.vue'
+import SettingsCompact from '@/components/SettingsCompact.vue'
 import SettingsInterval from '@/components/SettingsInterval.vue'
+import SettingsLive from '@/components/SettingsLive.vue'
 import SettingsMode from '@/components/SettingsMode.vue'
 import SettingsNickname from '@/components/SettingsNickname.vue'
-import ToggleSwitch from '@/components/ToggleSwitch.vue'
 import { ref } from 'vue'
 
 // const toast = useToast()
-const advencedSettings = ref(false)
 const nickname = ref('')
 const badge = ref(1)
 const accent = ref('FFFFFF')
-const mode = ref(0)
+const state = ref(0)
 const interval = ref(30)
+const compact = ref(false)
+const live = ref(false)
 </script>
 
 <template>
   <div class="settings">
     <div class="settings-parametrs">
-      <SettingsNickname />
+      <SettingsNickname v-model="nickname" />
+
+      <SettingsMode v-model="state" />
+
+      <SettingsInterval v-if="state < 2" v-model="interval" />
+
+      <div class="settings-parametrs-container">
+        <SettingsCompact v-model="compact" />
+        <SettingsLive v-model="live" />
+      </div>
 
       <SettingsBadge v-model="badge" />
 
       <SettingsAccent v-model="accent" />
-
-      <SettingsMode v-model="mode" />
-
-      <SettingsInterval v-model="interval" />
-
-      <ToggleSwitch v-model="advencedSettings" />
 
       <div class="settings-generate" @click="copyWidgetUrl">
         <CopyIcon class="settings-generate__icon" />
@@ -72,5 +77,10 @@ const interval = ref(30)
   line-height: 20px;
   letter-spacing: -0.5%;
   font-weight: 500;
+}
+.settings-parametrs-container {
+  display: flex;
+  gap: 32px;
+  width: 100%;
 }
 </style>
