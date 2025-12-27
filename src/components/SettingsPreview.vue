@@ -29,7 +29,7 @@ const widgetUrl = computed(() => {
 
 const copyDiscord = () => {
   navigator.clipboard.writeText('noobweer')
-  toast.info('Discord username copied to clipboard')
+  toast.success('Discord username copied to clipboard')
 }
 </script>
 
@@ -38,7 +38,6 @@ const copyDiscord = () => {
     <div class="settings-preview-header">
       <span class="settings-preview-header__label">Preview</span>
       <span class="settings-preview-header__desc">Preview transition interval: 5 seconds</span>
-
       <!-- Links -->
       <div class="settings-preview-header-links">
         <a
@@ -89,7 +88,7 @@ const copyDiscord = () => {
   line-height: 28px;
   margin-left: 8px;
   color: #fff;
-  opacity: 0.6;
+  opacity: 0.8;
 }
 .settings-preview-header-links {
   display: flex;
@@ -101,6 +100,7 @@ const copyDiscord = () => {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   border-radius: 12px;
   width: 32px;
   height: 32px;
