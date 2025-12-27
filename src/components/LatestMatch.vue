@@ -1,20 +1,16 @@
 <script setup>
-import { eloChangeFormatter } from '@/lib/eloChangeForametter'
+import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
+import { useStatsStore } from '@/stores/stats'
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
-const { elo, nickname, rank, result } = defineProps({
-  elo: Number,
-  nickname: String,
-  rank: Number,
-  result: Number,
-})
+const statsStore = useStatsStore()
 
-const resultCounter = useMotionValue(Math.abs(result))
+const resultCounter = useMotionValue(Math.abs(statsStore.latestMatchResult))
 const rounded = useTransform(() => Math.round(resultCounter.get()))
 
 watch(
-  () => result,
+  () => statsStore.latestMatchResult,
   (newResult) => {
     animate(resultCounter, Math.abs(newResult), {
       duration: 0.5,
@@ -25,29 +21,30 @@ watch(
 
 <template>
   <div class="latest">
-    <span class="latest__text">Latest</span>
+    <span class="latest__text">Last match</span>
     <div class="latest-match">
       <div class="latest-match-opponent">
         <img
-          :src="`https://mineskin.eu/helm/${nickname}/100.png`"
-          alt=""
+          :src="`https://mineskin.eu/helm/${statsStore.latestMatchNickname}/100.png`"
           class="latest-match-opponent__icon"
         />
         <div class="latest-match-opponent-info">
           <div class="latest-match-opponent-info-stats">
-            <span class="latest__text">{{ elo }} elo</span>
-            <span class="latest__text">#{{ rank }}</span>
+            <span class="latest__text">{{ statsStore.latestMatchElo }} elo</span>
+            <span class="latest__text">#{{ statsStore.latestMatchRank }}</span>
           </div>
-          <span class="latest-match-opponent-info__nickname">{{ nickname }}</span>
+          <span class="latest-match-opponent-info__nickname">{{
+            statsStore.latestMatchNickname
+          }}</span>
         </div>
       </div>
       <span
         class="latest-match-opponent__result"
         :class="{
-          'latest-match-opponent__result--positive': result > 0,
-          'latest-match-opponent__result--negative': result < 0,
+          'latest-match-opponent__result--positive': statsStore.latestMatchResult > 0,
+          'latest-match-opponent__result--negative': statsStore.latestMatchResult < 0,
         }"
-        >{{ eloChangeFormatter(result) }}<RowValue :value="rounded"
+        >{{ eloChangeFormatter(statsStore.latestMatchResult) }}<RowValue :value="rounded"
       /></span>
     </div>
   </div>

@@ -1,46 +1,13 @@
 <script setup>
 import { useConfigStore } from '@/stores/config'
+import { useStatsStore } from '@/stores/stats'
 import { animate, delay, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { onUnmounted, watch } from 'vue'
 import LatestMatch from './LatestMatch.vue'
 import TodayStats from './TodayStats.vue'
 import WinrateBadge from './WinrateBadge.vue'
 
-const {
-  nickname,
-  elo,
-  eloRank,
-  rank,
-  rankIcon,
-  badge,
-  accent,
-  eloChange,
-  wins,
-  loses,
-  avg,
-  winrate,
-  opponentNickname,
-  opponentElo,
-  opponentResult,
-} = defineProps({
-  nickname: String,
-  elo: Number,
-  eloRank: Number,
-  rank: String,
-  rankIcon: String,
-  badge: Number,
-  accent: String,
-  eloChange: Number,
-  wins: Number,
-  loses: Number,
-  avg: String,
-  winrate: Number,
-  opponentNickname: String,
-  opponentElo: Number,
-  opponentRank: Number,
-  opponentResult: Number,
-})
-
+const statsStore = useStatsStore()
 const configStore = useConfigStore()
 
 const toggleLatest = () => {
@@ -69,11 +36,11 @@ switch (configStore.state) {
     break
 }
 
-const eloCounter = useMotionValue(elo)
+const eloCounter = useMotionValue(statsStore.elo)
 const eloRounded = useTransform(() => Math.round(eloCounter.get()))
 
 watch(
-  () => elo,
+  () => statsStore.elo,
   (newElo) => {
     animate(eloCounter, newElo, {
       duration: 0.5,
@@ -81,11 +48,11 @@ watch(
   },
 )
 
-const leaderboardCounter = useMotionValue(eloRank)
+const leaderboardCounter = useMotionValue(statsStore.eloRank)
 const leaderboardRounded = useTransform(() => Math.round(leaderboardCounter.get()))
 
 watch(
-  () => eloRank,
+  () => statsStore.eloRank,
   (newRank) => {
     animate(leaderboardCounter, newRank, {
       duration: 0.5,
@@ -107,14 +74,16 @@ onUnmounted(() => {
           <span class="expanded-info-stats__text"><RowValue :value="eloRounded" /> elo</span>
           <div class="expanded-info-stats-leader expanded-info-stats__text">
             <span class="expanded-info-stats__hashtag">#</span>
-            <RowValue class="expanded-info-stats__text" :value="leaderboardRounded" />
+            <span class="expanded-info-stats__text">
+              <RowValue :value="leaderboardRounded" />
+            </span>
           </div>
         </div>
 
         <div class="expanded-info-stats-rank">
-          <span class="expanded-info-stats-rank__text">{{ rank }}</span>
+          <span class="expanded-info-stats-rank__text">{{ statsStore.rank }}</span>
           <img
-            :src="`/icons/${rankIcon || 'coal'}.png`"
+            :src="`/icons/ranks/${statsStore.rankIcon || 'coal'}.png`"
             alt="rank icon"
             class="expanded-info-stats-rank__icon"
           />
@@ -122,28 +91,26 @@ onUnmounted(() => {
       </div>
 
       <img
-        v-if="badge === 1"
-        src="/src/assets/icons/ranked.png"
+        v-if="configStore.badge === 1"
+        src="/icons/ranked.png"
         alt="ranked icon"
         class="expanded-info__icon"
       />
-      <WinrateBadge v-if="badge === 2" :percentage="winrate" :accent="accent" />
+      <WinrateBadge
+        v-else-if="configStore.badge === 2"
+        :accent="configStore.accent"
+        :percentage="statsStore.winrate"
+      />
       <img
-        v-if="badge === 3"
-        :src="`https://mineskin.eu/helm/${nickname}/100.png`"
+        v-else
+        :src="`https://mineskin.eu/helm/${configStore.nickname}/100.png`"
         alt="player head"
         class="expanded-info__head"
       />
     </div>
 
-    <LatestMatch
-      v-if="!configStore.isLatest"
-      :elo="opponentElo"
-      :nickname="opponentNickname"
-      :rank="opponentRank"
-      :result="opponentResult"
-    />
-    <TodayStats v-else :accent="accent" :wins="wins" :loses="loses" :elo="eloChange" :avg="avg" />
+    <LatestMatch v-if="!configStore.isLatest" />
+    <TodayStats v-else />
   </div>
 </template>
 

@@ -1,25 +1,22 @@
 <script setup>
-import AvgIcon from '@/assets/icons/avg.svg'
-import EloIcon from '@/assets/icons/elo.svg'
-import LosesIcon from '@/assets/icons/loses.svg'
-import WinsIcon from '@/assets/icons/wins.svg'
-import { eloChangeFormatter } from '@/lib/eloChangeForametter'
+import AvgIcon from '@/assets/icons/stats/avg.svg?component'
+import EloIcon from '@/assets/icons/stats/elo.svg?component'
+import LossesIcon from '@/assets/icons/stats/losses.svg?component'
+import WinsIcon from '@/assets/icons/stats/wins.svg?component'
+import { eloChangeFormatter } from '@/lib/eloChangeFormatter'
+import { useConfigStore } from '@/stores/config'
+import { useStatsStore } from '@/stores/stats'
 import { animate, RowValue, useMotionValue, useTransform } from 'motion-v'
 import { watch } from 'vue'
 
-const { accent, wins, loses, elo, avg } = defineProps({
-  accent: String,
-  wins: Number,
-  loses: Number,
-  elo: Number,
-  avg: String,
-})
+const statsStore = useStatsStore()
+const configStore = useConfigStore()
 
-const changeCounter = useMotionValue(Math.abs(elo))
+const changeCounter = useMotionValue(Math.abs(statsStore.eloChange))
 const changeRounded = useTransform(() => Math.round(changeCounter.get()))
 
 watch(
-  () => elo,
+  () => statsStore.eloChange,
   (newEloChange) => {
     animate(changeCounter, Math.abs(newEloChange), {
       duration: 0.5,
@@ -30,41 +27,42 @@ watch(
 
 <template>
   <div class="today">
-    <span class="today__text">Today</span>
+    <span class="today__text">Today session</span>
     <div class="today-stats">
       <div class="today-stats-values">
         <!-- Wins badge -->
         <div class="today-stats-values-badge">
           <div class="today-stats-values-badge-con">
-            <WinsIcon :style="`color: ${accent}`" />
+            <WinsIcon :style="`color: ${configStore.accent}`" />
           </div>
           <div class="today-stats-values-badge-info">
             <span class="today__text">Wins</span>
-            <span class="today-stats-values-badge__text">{{ wins || 0 }}</span>
+            <span class="today-stats-values-badge__text">{{ statsStore.wins || 0 }}</span>
           </div>
         </div>
 
         <!-- Loses badge -->
         <div class="today-stats-values-badge">
           <div class="today-stats-values-badge-con">
-            <LosesIcon :style="`color: ${accent}`" />
+            <LossesIcon :style="`color: ${configStore.accent}`" />
           </div>
           <div class="today-stats-values-badge-info">
             <span class="today__text">Losses</span>
-            <span class="today-stats-values-badge__text">{{ loses || 0 }}</span>
+            <span class="today-stats-values-badge__text">{{ statsStore.loses || 0 }}</span>
           </div>
         </div>
       </div>
+
       <div class="today-stats-values">
         <!-- Elo badge -->
         <div class="today-stats-values-badge">
           <div class="today-stats-values-badge-con">
-            <EloIcon :style="`color: ${accent}`" />
+            <EloIcon :style="`color: ${configStore.accent}`" />
           </div>
           <div class="today-stats-values-badge-info">
             <span class="today__text">Elo</span>
             <span class="today-stats-values-badge__text"
-              >{{ eloChangeFormatter(elo) }}<RowValue :value="changeRounded" />
+              >{{ eloChangeFormatter(statsStore.eloChange) }}<RowValue :value="changeRounded" />
             </span>
           </div>
         </div>
@@ -72,11 +70,11 @@ watch(
         <!-- Avg badge -->
         <div class="today-stats-values-badge">
           <div class="today-stats-values-badge-con">
-            <AvgIcon :style="`color: ${accent}`" />
+            <AvgIcon :style="`color: ${configStore.accent}`" />
           </div>
           <div class="today-stats-values-badge-info">
             <span class="today__text">Avg</span>
-            <span class="today-stats-values-badge__text">{{ avg || '00:00' }}</span>
+            <span class="today-stats-values-badge__text">{{ statsStore.avg || '00:00' }}</span>
           </div>
         </div>
       </div>

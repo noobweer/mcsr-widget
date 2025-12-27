@@ -5,6 +5,13 @@ export async function getUserInfo(nickname) {
     `https://api.mcsrranked.com/users/${encodeURIComponent(nickname)}`,
   )
   if (status === 200 && data.status === 'success') {
-    return { elo: data.data.eloRate, uuid: data.data.uuid, eloRank: data.data.eloRank }
+    const playerData = data.data
+    return {
+      uuid: playerData.uuid,
+      nickname: playerData.nickname,
+      elo: playerData.eloRate,
+      eloRank: playerData.eloRank,
+      seasonStatistics: playerData.statistics.season,
+    }
   }
 }

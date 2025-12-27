@@ -1,6 +1,8 @@
 <script setup>
+import CurrentMatch from '@/components/CurrentMatch.vue'
 import ExpandedOverlay from '@/components/ExpandedOverlay.vue'
 import MinimizedOverlay from '@/components/MinimizedOverlay.vue'
+import { preloadSplitIcons } from '@/lib/preloadSplitIcons'
 import { useConfigStore } from '@/stores/config'
 import { useStatsStore } from '@/stores/stats'
 import { delay, motion, useAnimate } from 'motion-v'
@@ -28,8 +30,6 @@ const toggleExtra = () => {
   }
 }
 
-const toggleIntervalID = setInterval(toggleOverlay, configStore.rate * 1000)
-
 const variants = {
   hidden: {
     scale: 0.5,
@@ -39,7 +39,7 @@ const variants = {
   },
   visible: {
     scale: 1,
-    height: configStore.leaderboard ? 64 : 48,
+    height: configStore.advancedMinimized ? 64 : 48,
     width: 226,
     padding: '0.5rem 1rem',
   },
@@ -57,6 +57,7 @@ const variants = {
   },
 }
 
+const toggleIntervalID = setInterval(toggleOverlay, configStore.rate * 1000)
 switch (configStore.state) {
   case 1:
     clearInterval(toggleIntervalID)
@@ -83,8 +84,15 @@ switch (configStore.state) {
 onUnmounted(() => {
   clearInterval(toggleIntervalID)
 })
-onMounted(() => {
-  statsStore.startAutoUpdate(configStore.nickname)
+onMounted(async () => {
+  await statsStore.userInfoUpdater(configStore.nickname)
+  await statsStore.userMatchesUpdater(configStore.nickname)
+  await statsStore.userLatestMatchUpdater(statsStore.uuid)
+  statsStore.startAutoUpdate(configStore.nickname, statsStore.uuid, configStore.liveMatch)
+
+  if (configStore.liveMatch) {
+    preloadSplitIcons()
+  }
 })
 </script>
 
@@ -97,47 +105,20 @@ onMounted(() => {
       initial="hidden"
       :animate="configStore.isExpanded ? 'extended' : 'visible'"
     >
-      <MinimizedOverlay
-        key="minimized-overlay"
-        v-if="!configStore.isExpanded"
-        :elo="statsStore.elo"
-        :eloRank="statsStore.eloRank"
-        :eloChange="statsStore.eloChange"
-        :rankIcon="statsStore.rankIcon"
-        :leaderboard="configStore.leaderboard"
-        :wins="statsStore.wins"
-        :loses="statsStore.loses"
-        :winrate="statsStore.winrate"
-      />
+      <MinimizedOverlay key="minimized-overlay" v-if="!configStore.isExpanded" />
 
-      <ExpandedOverlay
-        key="expanded-overlay"
-        v-else
-        :nickname="configStore.nickname"
-        :elo="statsStore.elo"
-        :eloRank="statsStore.eloRank"
-        :rank="statsStore.rank"
-        :rankIcon="statsStore.rankIcon"
-        :badge="configStore.badge"
-        :accent="configStore.accent"
-        :eloChange="statsStore.eloChange"
-        :wins="statsStore.wins"
-        :loses="statsStore.loses"
-        :avg="statsStore.avg"
-        :winrate="statsStore.winrate"
-        :opponentNickname="statsStore.latestMatchNickname"
-        :opponentElo="statsStore.latestMatchElo"
-        :opponentRank="statsStore.latestMatchRank"
-        :opponentResult="statsStore.latestMatchResult"
-      />
+      <ExpandedOverlay key="expanded-overlay" v-else />
     </motion.div>
+    <CurrentMatch />
   </div>
 </template>
 
 <style scoped>
 .container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 .widget {
   display: flex;

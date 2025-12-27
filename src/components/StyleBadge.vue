@@ -8,21 +8,26 @@ const { type } = defineProps({
 </script>
 
 <template>
-  <div class="badge" v-if="type === 'anim'" style="background: #fa3532">Animated</div>
-
-  <div class="badge" v-else style="background: #37a3de">Static</div>
+  <div
+    class="badge badge__label"
+    :style="type === 'anim' ? 'background: #fa3532' : 'background: #37A3DE'"
+  >
+    {{ type === 'anim' ? 'Animated' : 'Static' }}
+  </div>
 </template>
 
 <style scoped>
 .badge {
   display: flex;
-  padding: 0 0.5rem;
   justify-content: center;
   align-items: center;
-  border-radius: 0.5rem;
+  padding: 0 8px;
+  border-radius: 8px;
+}
+.badge__label {
   color: #fff;
-  font-size: 0.875rem;
+  font-size: 14px;
+  line-height: 20px;
   font-weight: 500;
-  line-height: 1.25rem;
 }
 </style>
