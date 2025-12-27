@@ -1,4 +1,5 @@
 import { eloToRank } from '@/lib/eloToRank'
+import { getLatestMatch } from '@/lib/getLatestMatch'
 import { getLiveMatch } from '@/lib/getLiveMatch'
 import { getUserInfo } from '@/lib/getUserInfo'
 import { getUserMatches } from '@/lib/getUserMatches'
@@ -22,7 +23,7 @@ export const useStatsStore = defineStore('stats', {
     avg: '',
 
     // Latest Match and Opponent Info
-    latestMatchNickname: '',
+    latestMatchNickname: 'Opponent',
     latestMatchElo: 0,
     latestMatchRank: 0,
     latestMatchResult: 0,
@@ -69,10 +70,6 @@ export const useStatsStore = defineStore('stats', {
         this.eloChange = 0
         this.winrate = 0
         this.avg = msToHMS(0)
-        this.latestMatchNickname = ''
-        this.latestMatchElo = 0
-        this.latestMatchRank = 0
-        this.latestMatchResult = 0
         return
       }
 
@@ -111,20 +108,6 @@ export const useStatsStore = defineStore('stats', {
         eloChange += changeObj.change
       }
 
-      let latestMatchOpponent
-      if (latestMatch.players[0].uuid !== this.uuid) {
-        latestMatchOpponent = latestMatch.players[0]
-      } else {
-        latestMatchOpponent = latestMatch.players[1]
-      }
-
-      const latestMatchResult =
-        latestMatch.changes[0].uuid === this.uuid
-          ? latestMatch.changes[0].change
-          : latestMatch.changes[1].change
-
-      preloadImage(`https://mineskin.eu/helm/${latestMatchOpponent.nickname}/100.png`)
-
       this.wins = wins
       this.loses = loses
       this.eloChange = eloChange
@@ -132,6 +115,25 @@ export const useStatsStore = defineStore('stats', {
 
       const avgMs = winTimings.reduce((a, b) => a + b, 0) / (winTimings.length || 1)
       this.avg = msToHMS(avgMs)
+    },
+
+    async userLatestMatchUpdater(uuid) {
+      const latestMatch = await getLatestMatch(uuid)
+      if (!latestMatch) return
+
+      const latestMatchOpponent =
+        latestMatch.players[0].uuid !== uuid ? latestMatch.players[0] : latestMatch.players[1]
+
+      const latestMatchResult =
+        latestMatch.changes[0].uuid === uuid
+          ? latestMatch.changes[0].change
+          : latestMatch.changes[1].change
+
+      if (latestMatchOpponent.nickname === this.latestMatchNickname) {
+        return
+      }
+
+      preloadImage(`https://mineskin.eu/helm/${latestMatchOpponent.nickname}/100.png`)
 
       this.latestMatchNickname = latestMatchOpponent.nickname
       this.latestMatchElo = latestMatchOpponent.eloRate
@@ -192,6 +194,7 @@ export const useStatsStore = defineStore('stats', {
       this._intervalId = setInterval(() => {
         this.userInfoUpdater(nickname)
         this.userMatchesUpdater(nickname)
+        this.userLatestMatchUpdater(uuid)
       }, 10000)
       if (liveMatch) {
         this.__intervalId = setInterval(() => {

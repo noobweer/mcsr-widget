@@ -30,8 +30,6 @@ const toggleExtra = () => {
   }
 }
 
-const toggleIntervalID = setInterval(toggleOverlay, configStore.rate * 1000)
-
 const variants = {
   hidden: {
     scale: 0.5,
@@ -59,6 +57,7 @@ const variants = {
   },
 }
 
+const toggleIntervalID = setInterval(toggleOverlay, configStore.rate * 1000)
 switch (configStore.state) {
   case 1:
     clearInterval(toggleIntervalID)
@@ -88,6 +87,7 @@ onUnmounted(() => {
 onMounted(async () => {
   await statsStore.userInfoUpdater(configStore.nickname)
   await statsStore.userMatchesUpdater(configStore.nickname)
+  await statsStore.userLatestMatchUpdater(statsStore.uuid)
   statsStore.startAutoUpdate(configStore.nickname, statsStore.uuid, configStore.liveMatch)
 
   if (configStore.liveMatch) {

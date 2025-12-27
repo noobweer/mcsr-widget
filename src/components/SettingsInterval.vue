@@ -43,7 +43,7 @@ const decrease = () => setValue(props.modelValue - props.step)
 <template>
   <div class="interval">
     <div class="interval__label">
-      <span style="color: #ffffff">Animation rate</span>
+      <span style="color: #ffffff">transition interval</span>
       <span style="color: rgba(255, 255, 255, 0.4)">in seconds</span>
     </div>
 
