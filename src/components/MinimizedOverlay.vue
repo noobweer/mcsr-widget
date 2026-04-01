@@ -50,7 +50,7 @@ watch(
     <div class="miminized-info">
       <div class="miminized-info-rank">
         <img
-          :src="`/icons/ranks/${statsStore.rankIcon || 'coal'}.png`"
+          :src="`/icons/ranks/${statsStore.rankIcon || 'unranked'}.png`"
           alt="rank icon"
           :class="
             configStore.advancedMinimized
