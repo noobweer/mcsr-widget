@@ -8,6 +8,7 @@ export async function getUserMatches(nickname) {
         excludedecay: false,
         type: 2,
         count: 50,
+        _t: Date.now(),
       },
     },
   )

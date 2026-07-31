@@ -2,7 +2,8 @@ import axios from 'axios'
 
 export async function getLatestMatch(uuid) {
   const { data } = await axios.get(
-    `https://api.mcsrranked.com/users/${uuid}/matches?type=2&count=1`,
+    `https://api.mcsrranked.com/users/${uuid}/matches`,
+    { params: { type: 2, count: 1, _t: Date.now() } },
   )
 
   if (data.status !== 'success') return null

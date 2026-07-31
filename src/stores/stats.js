@@ -45,6 +45,7 @@ export const useStatsStore = defineStore('stats', {
   actions: {
     async userInfoUpdater(nickname) {
       const userInfo = await getUserInfo(nickname)
+      if (!userInfo) return
 
       this.elo = userInfo.elo
       this.eloRank = userInfo.eloRank
@@ -55,7 +56,7 @@ export const useStatsStore = defineStore('stats', {
 
     async userMatchesUpdater(nickname) {
       const userMatches = await getUserMatches(nickname)
-      if (!userMatches.length) return
+      if (!userMatches || !userMatches.length) return
 
       // TODO: Move to env variable SESSION_GAP
       const SESSION_GAP = 6 * 3600 * 1000 // 6 hours

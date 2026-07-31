@@ -1,7 +1,9 @@
 import axios from 'axios'
 
 export async function getLiveMatch(uuid) {
-  const { data } = await axios.get('https://api.mcsrranked.com/live')
+  const { data } = await axios.get('https://api.mcsrranked.com/live', {
+    params: { _t: Date.now() },
+  })
 
   if (data.status !== 'success') return null
 
