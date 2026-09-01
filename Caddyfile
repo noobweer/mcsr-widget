@@ -1,0 +1,27 @@
+{
+    auto_https off
+}
+
+:80 {
+    root * /srv
+    encode gzip zstd
+
+    # Vite hashed assets and static files caching
+    @assets path /assets/* /icons/* *.ico *.svg *.woff2
+    header @assets Cache-Control "public, max-age=31536000, immutable"
+
+    # Avoid caching index.html for instant release updates
+    @html path /index.html /
+    header @html Cache-Control "no-cache, no-store, must-revalidate"
+
+    # Security and OBS/Iframe embedding support
+    header {
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Content-Security-Policy "frame-ancestors *;"
+    }
+
+    # Vue Router SPA fallback
+    try_files {path} /index.html
+    file_server
+}

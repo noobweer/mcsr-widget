@@ -1,0 +1,19 @@
+services:
+  frontend:
+    build: .
+    container_name: mcsr_widget_frontend
+    restart: unless-stopped
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mcsr-widget.rule=Host(`ranked.noobweer.ru`)"
+      - "traefik.http.routers.mcsr-widget.entrypoints=websecure"
+      - "traefik.http.routers.mcsr-widget.tls=true"
+      - "traefik.http.routers.mcsr-widget.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.mcsr-widget.priority=10"
+      - "traefik.http.services.mcsr-widget.loadbalancer.server.port=80"
+
+networks:
+  traefik-net:
+    external: true
